@@ -34,13 +34,15 @@ export default function CandidateTable() {
           value={search}
           onChange={(event) => setSearch(event.target.value)}
           placeholder="Search candidates..."
-          className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-slate-400"
+          className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 placeholder:text-slate-500 outline-none focus:border-slate-400"
         />
 
         <select
           value={status}
           onChange={(event) => setStatus(event.target.value)}
-          className="rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-slate-400"
+          className={`rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-slate-400 ${
+            status === "All Statuses" ? "text-slate-500" : "text-slate-700"
+          }`}
         >
           <option>All Statuses</option>
           <option>Qualified</option>
@@ -53,7 +55,9 @@ export default function CandidateTable() {
         <select
           value={recruiter}
           onChange={(event) => setRecruiter(event.target.value)}
-          className="rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-slate-400"
+          className={`rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-slate-400 ${
+            recruiter === "All Recruiters" ? "text-slate-500" : "text-slate-700"
+          }`}
         >
           <option>All Recruiters</option>
           <option>Michael Sullivan</option>
@@ -61,7 +65,7 @@ export default function CandidateTable() {
         </select>
       </div>
 
-      <div className="space-y-3 lg:hidden">
+      <div className="space-y-3 xl:hidden">
         {filteredCandidates.map((candidate) => (
           <Link
             href={`/candidates/${candidate.id}`}
@@ -86,7 +90,7 @@ export default function CandidateTable() {
         ))}
       </div>
 
-      <div className="hidden overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm lg:block">
+      <div className="hidden overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm xl:block">
         <table className="w-full text-left text-sm">
           <thead className="bg-slate-100 text-slate-600">
             <tr>

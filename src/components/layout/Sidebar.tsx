@@ -28,7 +28,7 @@ export default function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="hidden min-h-screen w-64 border-r border-slate-200 bg-slate-950 text-white lg:block">
+    <aside className="fixed left-0 top-0 z-40 hidden h-screen w-64 border-r border-slate-200 bg-slate-950 text-white xl:block">
       <div className="border-b border-slate-800 p-6">
         <h1 className="text-xl font-bold">Compass CRM</h1>
         <p className="mt-1 text-sm text-slate-400">Recruiting Platform</p>

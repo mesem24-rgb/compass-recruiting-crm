@@ -2,12 +2,14 @@ type PageHeaderProps = {
   title: string;
   description: string;
   actionLabel?: string;
+  onAction?: () => void;
 };
 
 export default function PageHeader({
   title,
   description,
   actionLabel,
+  onAction,
 }: PageHeaderProps) {
   return (
     <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -17,7 +19,10 @@ export default function PageHeader({
       </div>
 
       {actionLabel && (
-        <button className="rounded-lg bg-slate-950 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800">
+        <button
+          onClick={onAction}
+          className="rounded-lg bg-slate-950 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800"
+        >
           {actionLabel}
         </button>
       )}
