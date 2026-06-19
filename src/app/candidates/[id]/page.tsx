@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import AppShell from "@/components/layout/AppShell";
 import StatusBadge from "@/components/ui/StatusBadge";
 import { getCandidateById } from "@/lib/candidates";
+import DeleteCandidateButton from "@/components/candidates/DeleteCandidateButton";
+import EditCandidateButton from "@/components/candidates/EditCandidateButton";
 
 type CandidateDetailPageProps = {
   params: Promise<{
@@ -53,9 +55,7 @@ export default async function CandidateDetailPage({
         </h2>
 
         <div className="flex flex-wrap gap-3">
-          <button className="rounded-lg bg-slate-950 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800">
-            Edit Candidate
-          </button>
+          <EditCandidateButton candidate={candidate} />
 
           <button className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
             Schedule Interview
@@ -68,6 +68,7 @@ export default async function CandidateDetailPage({
           <button className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
             Add Note
           </button>
+          <DeleteCandidateButton candidateId={candidate.id} />
         </div>
       </div>
 

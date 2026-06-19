@@ -47,3 +47,39 @@ export async function getCandidateById(id: string): Promise<Candidate | null> {
 
   return data;
 }
+
+/* SECTION: Delete Candidate */
+
+export async function deleteCandidate(id: string) {
+  const { error } = await supabase.from("candidates").delete().eq("id", id);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}
+
+/* SECTION: Update Candidate */
+
+export type UpdateCandidateInput = {
+  name: string;
+  role: string;
+  email: string;
+  phone: string;
+  location: string;
+  status: string;
+  source: string;
+  recruiter: string;
+  experience: string;
+  salary: string;
+};
+
+export async function updateCandidate(id: string, candidate: UpdateCandidateInput) {
+  const { error } = await supabase
+    .from("candidates")
+    .update(candidate)
+    .eq("id", id);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}
