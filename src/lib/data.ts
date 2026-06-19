@@ -116,7 +116,7 @@ export const clients = [
     phone: "(214) 555-0133",
     location: "Dallas, TX",
     industry: "Hospitality",
-    openJobs: 4,
+    open_jobs: 4,
     placements: 9,
     revenue: "$185,000",
     notes: [
@@ -133,7 +133,7 @@ export const clients = [
     phone: "(228) 555-0174",
     location: "Gulfport, MS",
     industry: "Retail",
-    openJobs: 2,
+    open_jobs: 2,
     placements: 5,
     revenue: "$92,000",
     notes: [
@@ -149,7 +149,7 @@ export const clients = [
     phone: "(404) 555-0127",
     location: "Atlanta, GA",
     industry: "Food Service",
-    openJobs: 6,
+    open_jobs: 6,
     placements: 14,
     revenue: "$260,000",
     notes: [

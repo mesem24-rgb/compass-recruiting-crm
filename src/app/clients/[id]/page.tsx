@@ -2,7 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import AppShell from "@/components/layout/AppShell";
 import StatusBadge from "@/components/ui/StatusBadge";
-import { clients, jobOrders } from "@/lib/data";
+import { getClientById } from "@/lib/clients";
+import { jobOrders } from "@/lib/data";
 
 type ClientDetailPageProps = {
   params: Promise<{
@@ -15,7 +16,7 @@ export default async function ClientDetailPage({
 }: ClientDetailPageProps) {
   const { id } = await params;
 
-  const client = clients.find((item) => item.id === id);
+  const client = await getClientById(id);
 
   if (!client) {
     notFound();
@@ -49,7 +50,7 @@ export default async function ClientDetailPage({
           <p className="mt-1 text-slate-500">{client.location}</p>
         </div>
 
-        <StatusBadge status={`${client.openJobs} Open Jobs`} />
+        <StatusBadge status={`${client.open_jobs ?? 0} Open Jobs`} />
       </div>
 
       {/* SECTION: Client Actions */}
@@ -88,14 +89,14 @@ export default async function ClientDetailPage({
             </h2>
 
             <div className="mt-6 grid gap-4 md:grid-cols-2">
-              <Info label="Primary Contact" value={client.contact} />
-              <Info label="Email" value={client.email} />
-              <Info label="Phone" value={client.phone} />
-              <Info label="Industry" value={client.industry} />
-              <Info label="Open Jobs" value={String(client.openJobs)} />
-              <Info label="Placements" value={String(client.placements)} />
-              <Info label="Revenue Generated" value={client.revenue} />
-              <Info label="Location" value={client.location} />
+              {client.industry ?? "No industry listed"}
+              {client.location ?? "No location listed"}
+              {client.contact ?? "No contact listed"}
+              {client.email ?? "No email listed"}
+              {client.phone ?? "No phone listed"}
+              {String(client.open_jobs ?? 0)}
+              {String(client.placements ?? 0)}
+              {client.revenue ?? "$0"}
             </div>
           </div>
 
@@ -189,9 +190,9 @@ export default async function ClientDetailPage({
             </h2>
 
             <div className="mt-4 grid gap-3">
-              <Metric label="Open Jobs" value={String(client.openJobs)} />
-              <Metric label="Placements" value={String(client.placements)} />
-              <Metric label="Revenue" value={client.revenue} />
+              <Metric label="Open Jobs" value={String(client.open_jobs ?? 0)} />
+              <Metric label="Placements" value={String(client.placements ?? 0)} />
+              <Metric label="Revenue" value={client.revenue ?? "$0"} />
             </div>
           </div>
 
@@ -202,15 +203,8 @@ export default async function ClientDetailPage({
               Client Notes
             </h2>
 
-            <div className="mt-4 space-y-3">
-              {client.notes.map((note) => (
-                <div
-                  key={note}
-                  className="rounded-lg bg-slate-50 p-4 text-sm text-slate-600"
-                >
-                  {note}
-                </div>
-              ))}
+            <div className="mt-4 rounded-lg border border-dashed border-slate-300 bg-slate-50 p-4 text-sm text-slate-500">
+              Client notes will be connected in a future database phase.
             </div>
           </div>
         </aside>
