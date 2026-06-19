@@ -1,10 +1,15 @@
 import CandidatesPageClient from "@/components/candidates/CandidatesPageClient";
 import AppShell from "@/components/layout/AppShell";
+import { getCandidates } from "@/lib/candidates";
 
-export default function CandidatesPage() {
+export default async function CandidatesPage() {
+  const candidates = await getCandidates();
+
   return (
     <AppShell>
-      <CandidatesPageClient />
+      {/* SECTION: Candidates Page Client */}
+
+      <CandidatesPageClient candidates={candidates} />
     </AppShell>
   );
 }

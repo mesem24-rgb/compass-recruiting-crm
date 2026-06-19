@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import AppShell from "@/components/layout/AppShell";
 import StatusBadge from "@/components/ui/StatusBadge";
-import { candidates } from "@/lib/data";
+import { getCandidateById } from "@/lib/candidates";
 
 type CandidateDetailPageProps = {
   params: Promise<{
@@ -15,7 +15,7 @@ export default async function CandidateDetailPage({
 }: CandidateDetailPageProps) {
   const { id } = await params;
 
-  const candidate = candidates.find((item) => item.id === id);
+  const candidate = await getCandidateById(id);
 
   if (!candidate) {
     notFound();
@@ -39,10 +39,10 @@ export default async function CandidateDetailPage({
           <h1 className="text-2xl font-bold text-slate-950">
             {candidate.name}
           </h1>
-          <p className="text-slate-500">{candidate.role}</p>
+          <p className="text-slate-500">{candidate.role ?? "No role listed"}</p>
         </div>
 
-        <StatusBadge status={candidate.status} />
+        <StatusBadge status={candidate.status ?? "Qualified"} />
       </div>
 
       {/* SECTION: Candidate Actions */}
@@ -81,14 +81,38 @@ export default async function CandidateDetailPage({
             </h2>
 
             <div className="mt-6 grid gap-4 md:grid-cols-2">
-              <Info label="Email" value={candidate.email} />
-              <Info label="Phone" value={candidate.phone} />
-              <Info label="Location" value={candidate.location} />
-              <Info label="Source" value={candidate.source} />
-              <Info label="Experience" value={candidate.experience} />
-              <Info label="Target Salary" value={candidate.salary} />
-              <Info label="Recruiter" value={candidate.recruiter} />
-              <Info label="Last Contact" value={candidate.lastContact} />
+              <Info
+                label="Email"
+                value={candidate.email ?? "No email listed"}
+              />
+              <Info
+                label="Phone"
+                value={candidate.phone ?? "No phone listed"}
+              />
+              <Info
+                label="Location"
+                value={candidate.location ?? "No location listed"}
+              />
+              <Info
+                label="Source"
+                value={candidate.source ?? "No source listed"}
+              />
+              <Info
+                label="Experience"
+                value={candidate.experience ?? "No experience listed"}
+              />
+              <Info
+                label="Target Salary"
+                value={candidate.salary ?? "No salary listed"}
+              />
+              <Info
+                label="Recruiter"
+                value={candidate.recruiter ?? "Unassigned"}
+              />
+              <Info
+                label="Created"
+                value={new Date(candidate.created_at).toLocaleDateString()}
+              />
             </div>
           </div>
 
@@ -130,19 +154,8 @@ export default async function CandidateDetailPage({
               </button>
             </div>
 
-            <div className="space-y-4">
-              {candidate.notes.map((note) => (
-                <div
-                  key={note}
-                  className="rounded-lg border border-slate-100 bg-slate-50 p-4"
-                >
-                  <p className="text-sm text-slate-700">{note}</p>
-
-                  <p className="mt-2 text-xs text-slate-400">
-                    {candidate.recruiter} • Recent activity
-                  </p>
-                </div>
-              ))}
+            <div className="rounded-lg border border-dashed border-slate-300 bg-slate-50 p-4 text-sm text-slate-500">
+              Notes will be connected in the next database phase.
             </div>
           </div>
         </section>
@@ -182,8 +195,8 @@ export default async function CandidateDetailPage({
             </h2>
 
             <div className="mt-4 space-y-2 text-sm text-slate-600">
-              <p>Current Stage: {candidate.status}</p>
-              <p>Assigned Recruiter: {candidate.recruiter}</p>
+              <p>Current Stage: {candidate.status ?? "Qualified"}</p>
+              <p>Assigned Recruiter: {candidate.recruiter ?? "Unassigned"}</p>
             </div>
           </div>
         </aside>

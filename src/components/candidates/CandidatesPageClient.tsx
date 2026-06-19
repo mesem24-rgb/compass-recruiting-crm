@@ -3,8 +3,15 @@
 import CandidateTable from "@/components/candidates/CandidateTable";
 import { useModals } from "@/components/providers/ModalProvider";
 import PageHeader from "@/components/ui/PageHeader";
+import type { Candidate } from "@/lib/candidates";
 
-export default function CandidatesPageClient() {
+type CandidatesPageClientProps = {
+  candidates: Candidate[];
+};
+
+export default function CandidatesPageClient({
+  candidates,
+}: CandidatesPageClientProps) {
   const { openCandidateModal } = useModals();
 
   return (
@@ -15,8 +22,8 @@ export default function CandidatesPageClient() {
         actionLabel="New Candidate"
         onAction={openCandidateModal}
       />
-
-      <CandidateTable />
+{/* SECTION: Candidate Table */}
+      <CandidateTable candidates={candidates} />
     </>
   );
 }
