@@ -4,6 +4,8 @@ import AppShell from "@/components/layout/AppShell";
 import StatusBadge from "@/components/ui/StatusBadge";
 import { getClientById } from "@/lib/clients";
 import { jobOrders } from "@/lib/data";
+import DeleteClientButton from "@/components/clients/DeleteClientButton";
+import EditClientButton from "@/components/clients/EditClientButton";
 
 type ClientDetailPageProps = {
   params: Promise<{
@@ -61,9 +63,7 @@ export default async function ClientDetailPage({
         </h2>
 
         <div className="flex flex-wrap gap-3">
-          <button className="rounded-lg bg-slate-950 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800">
-            Edit Client
-          </button>
+          <EditClientButton client={client} />
 
           <button className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
             Add Job Order
@@ -76,6 +76,7 @@ export default async function ClientDetailPage({
           <button className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
             Add Note
           </button>
+          <DeleteClientButton clientId={client.id} />
         </div>
       </div>
 

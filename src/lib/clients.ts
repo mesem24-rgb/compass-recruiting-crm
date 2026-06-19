@@ -66,3 +66,36 @@ export async function createClient(client: CreateClientInput) {
     throw new Error(error.message);
   }
 }
+
+/* SECTION: Delete Client */
+
+export async function deleteClient(id: string) {
+  const { error } = await supabase.from("clients").delete().eq("id", id);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}
+
+/* SECTION: Update Client */
+
+export type UpdateClientInput = {
+  company: string;
+  contact: string;
+  email: string;
+  phone: string;
+  industry: string;
+  location: string;
+  revenue: string;
+};
+
+export async function updateClient(id: string, client: UpdateClientInput) {
+  const { error } = await supabase
+    .from("clients")
+    .update(client)
+    .eq("id", id);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}
