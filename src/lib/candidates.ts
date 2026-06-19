@@ -83,3 +83,58 @@ export async function updateCandidate(id: string, candidate: UpdateCandidateInpu
     throw new Error(error.message);
   }
 }
+
+/* SECTION: Candidate Note Type */
+
+export type CandidateNote = {
+  id: string;
+  created_at: string;
+  candidate_id: string;
+  note: string;
+  author: string | null;
+};
+
+/* SECTION: Candidate Notes Queries */
+
+export async function getCandidateNotes(
+  candidateId: string,
+): Promise<CandidateNote[]> {
+  const { data, error } = await supabase
+    .from("candidate_notes")
+    .select("*")
+    .eq("candidate_id", candidateId)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data ?? [];
+}
+
+/* SECTION: Add Candidate Note */
+
+export async function addCandidateNote(candidateId: string, note: string) {
+  const { error } = await supabase.from("candidate_notes").insert({
+    candidate_id: candidateId,
+    note,
+    author: "Michael Sullivan",
+  });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}
+
+/* SECTION: Delete Candidate Note */
+
+export async function deleteCandidateNote(id: string) {
+  const { error } = await supabase
+    .from("candidate_notes")
+    .delete()
+    .eq("id", id);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}

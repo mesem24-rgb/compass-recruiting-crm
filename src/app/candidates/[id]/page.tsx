@@ -2,9 +2,11 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import AppShell from "@/components/layout/AppShell";
 import StatusBadge from "@/components/ui/StatusBadge";
-import { getCandidateById } from "@/lib/candidates";
 import DeleteCandidateButton from "@/components/candidates/DeleteCandidateButton";
 import EditCandidateButton from "@/components/candidates/EditCandidateButton";
+import AddCandidateNote from "@/components/candidates/AddCandidateNote";
+import { getCandidateById, getCandidateNotes } from "@/lib/candidates";
+import DeleteCandidateNoteButton from "@/components/candidates/DeleteCandidateNoteButton";
 
 type CandidateDetailPageProps = {
   params: Promise<{
@@ -18,6 +20,7 @@ export default async function CandidateDetailPage({
   const { id } = await params;
 
   const candidate = await getCandidateById(id);
+  const notes = await getCandidateNotes(id);
 
   if (!candidate) {
     notFound();
@@ -149,14 +152,34 @@ export default async function CandidateDetailPage({
               <h2 className="text-lg font-semibold text-slate-950">
                 Recruiter Notes
               </h2>
-
-              <button className="rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
-                Add Note
-              </button>
             </div>
 
-            <div className="rounded-lg border border-dashed border-slate-300 bg-slate-50 p-4 text-sm text-slate-500">
-              Notes will be connected in the next database phase.
+            <AddCandidateNote candidateId={candidate.id} />
+
+            <div className="mt-4 space-y-4">
+              {notes.length > 0 ? (
+                notes.map((note) => (
+                  <div
+                    key={note.id}
+                    className="rounded-lg border border-slate-100 bg-slate-50 p-4"
+                  >
+                    <p className="text-sm text-slate-700">{note.note}</p>
+
+                    <div className="mt-2 flex items-center justify-between">
+                      <p className="text-xs text-slate-400">
+                        {note.author ?? "Recruiter"} •{" "}
+                        {new Date(note.created_at).toLocaleDateString()}
+                      </p>
+
+                      <DeleteCandidateNoteButton noteId={note.id} />
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="rounded-lg border border-dashed border-slate-300 bg-slate-50 p-4 text-sm text-slate-500">
+                  No notes have been added yet.
+                </div>
+              )}
             </div>
           </div>
         </section>
