@@ -2,7 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import AppShell from "@/components/layout/AppShell";
 import StatusBadge from "@/components/ui/StatusBadge";
-import { candidates, jobOrders } from "@/lib/data";
+import { candidates } from "@/lib/data";
+import { getJobOrderById } from "@/lib/job-orders";
 
 type JobOrderDetailPageProps = {
   params: Promise<{
@@ -15,7 +16,7 @@ export default async function JobOrderDetailPage({
 }: JobOrderDetailPageProps) {
   const { id } = await params;
 
-  const job = jobOrders.find((item) => item.id === id);
+  const job = await getJobOrderById(id);
 
   if (!job) {
     notFound();
@@ -37,12 +38,12 @@ export default async function JobOrderDetailPage({
       <div className="mt-4 flex flex-col gap-4 rounded-xl border border-slate-200 bg-white p-6 shadow-sm md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-950">{job.title}</h1>
-          <p className="text-slate-500">{job.client}</p>
+          <p className="text-slate-500">{job.client ?? "No client listed"}</p>
         </div>
 
         <div className="flex flex-wrap gap-2">
-          <StatusBadge status={job.status} />
-          <StatusBadge status={job.priority} />
+          <StatusBadge status={job.status ?? "Open"} />
+          <StatusBadge status={job.priority ?? "Medium"} />
         </div>
       </div>
 
@@ -82,12 +83,29 @@ export default async function JobOrderDetailPage({
             </h2>
 
             <div className="mt-6 grid gap-4 md:grid-cols-2">
-              <Info label="Client" value={job.client} />
-              <Info label="Location" value={job.location} />
-              <Info label="Salary Range" value={job.salaryRange} />
-              <Info label="Assigned Recruiter" value={job.assignedRecruiter} />
-              <Info label="Candidates Submitted" value={String(job.candidates)} />
-              <Info label="Priority" value={job.priority} />
+              <Info label="Client" value={job.client ?? "No client listed"} />
+              <Info label="Status" value={job.status ?? "Open"} />
+              <Info label="Priority" value={job.priority ?? "Medium"} />
+              <Info
+                label="Location"
+                value={job.location ?? "No location listed"}
+              />
+              <Info
+                label="Salary Range"
+                value={job.salary_range ?? "No salary listed"}
+              />
+              <Info
+                label="Assigned Recruiter"
+                value={job.assigned_recruiter ?? "Unassigned"}
+              />
+              <Info
+                label="Candidates Submitted"
+                value={String(job.candidates ?? 0)}
+              />
+              <Info
+                label="Created"
+                value={new Date(job.created_at).toLocaleDateString()}
+              />
             </div>
 
             <div className="mt-6 rounded-lg bg-slate-50 p-4">
@@ -95,7 +113,7 @@ export default async function JobOrderDetailPage({
                 Description
               </p>
               <p className="mt-2 text-sm leading-6 text-slate-700">
-                {job.description}
+                {job.description ?? "No description listed"}
               </p>
             </div>
           </div>
@@ -142,21 +160,15 @@ export default async function JobOrderDetailPage({
 
             <div className="space-y-4">
               <Activity
-                title="Candidate submitted"
-                description="Amanda Pierce was submitted for review."
-                time="2 hours ago"
-              />
-
-              <Activity
-                title="Client update"
-                description="Client requested additional candidates with multi-unit leadership experience."
-                time="Yesterday"
-              />
-
-              <Activity
                 title="Job order created"
-                description="Regional Operations Manager job order was added."
-                time="3 days ago"
+                description="This job order was added to the recruiting pipeline."
+                time={new Date(job.created_at).toLocaleDateString()}
+              />
+
+              <Activity
+                title="Candidate submissions"
+                description="Candidate submission tracking will be connected in a future phase."
+                time="Coming soon"
               />
             </div>
           </div>
@@ -171,9 +183,9 @@ export default async function JobOrderDetailPage({
             </h2>
 
             <div className="mt-4 space-y-3 text-sm text-slate-600">
-              <p>Status: {job.status}</p>
-              <p>Priority: {job.priority}</p>
-              <p>Recruiter: {job.assignedRecruiter}</p>
+              <p>Status: {job.status ?? "Open"}</p>
+              <p>Priority: {job.priority ?? "Medium"}</p>
+              <p>Recruiter: {job.assigned_recruiter ?? "Unassigned"}</p>
             </div>
           </div>
 
@@ -185,9 +197,9 @@ export default async function JobOrderDetailPage({
             </h2>
 
             <div className="mt-4 grid gap-3">
-              <Metric label="Submitted" value={String(job.candidates)} />
-              <Metric label="Interviewing" value="3" />
-              <Metric label="Offers" value="1" />
+              <Metric label="Submitted" value={String(job.candidates ?? 0)} />
+              <Metric label="Interviewing" value="0" />
+              <Metric label="Offers" value="0" />
             </div>
           </div>
         </aside>
