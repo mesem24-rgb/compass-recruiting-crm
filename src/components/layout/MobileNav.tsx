@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
 import Link from "next/link";
 import {
@@ -41,9 +42,15 @@ export default function MobileNav() {
 
       {open && (
         <div className="absolute left-0 top-12 z-[9999] w-72 rounded-xl border border-slate-800 bg-slate-950 p-3 text-white shadow-2xl">
-          <div className="border-b border-slate-800 px-3 pb-3">
-            <h2 className="font-bold">Compass CRM</h2>
-            <p className="text-xs text-slate-400">Recruiting Platform</p>
+          <div className="mb-4 rounded-xl bg-white px-4 py-3 shadow-sm">
+            <Image
+              src="/compass-logo.jpg"
+              alt="Compass Group logo"
+              width={120}
+              height={60}
+              className="mx-auto h-auto max-h-20 w-auto object-contain"
+              priority
+            />
           </div>
 
           <nav className="mt-3 space-y-1">

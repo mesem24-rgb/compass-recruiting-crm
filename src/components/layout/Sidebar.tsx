@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -29,16 +30,32 @@ export default function Sidebar() {
 
   return (
     <aside className="fixed left-0 top-0 z-40 hidden h-screen w-64 border-r border-slate-200 bg-slate-950 text-white xl:block">
-      <div className="border-b border-slate-800 p-6">
-        <h1 className="text-xl font-bold">Compass CRM</h1>
-        <p className="mt-1 text-sm text-slate-400">Recruiting Platform</p>
+      <div className="border-b border-slate-800 p-5">
+        <div className="mb-4 rounded-xl bg-white px-4 py-3 shadow-sm">
+          <Image
+            src="/compass-logo.jpg"
+            alt="Compass Group logo"
+            width={150}
+            height={90}
+            className="mx-auto h-auto max-h-20 w-auto object-contain"
+            priority
+          />
+        </div>
+
+        <h1 className="text-lg font-bold leading-tight">
+          Compass Group Recruiting
+        </h1>
+
+        <p className="mt-1 text-sm text-slate-400">Talent Acquisition CRM</p>
       </div>
 
       <nav className="space-y-1 p-4">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive =
-            item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
+            item.href === "/"
+              ? pathname === "/"
+              : pathname.startsWith(item.href);
 
           return (
             <Link

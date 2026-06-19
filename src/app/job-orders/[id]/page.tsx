@@ -5,12 +5,14 @@ import StatusBadge from "@/components/ui/StatusBadge";
 import { candidates, jobOrders } from "@/lib/data";
 
 type JobOrderDetailPageProps = {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 };
 
-export default async function JobOrderDetailPage({ params }: JobOrderDetailPageProps) {
+export default async function JobOrderDetailPage({
+  params,
+}: JobOrderDetailPageProps) {
   const { id } = await params;
 
   const job = jobOrders.find((item) => item.id === id);
@@ -21,52 +23,97 @@ export default async function JobOrderDetailPage({ params }: JobOrderDetailPageP
 
   return (
     <AppShell>
-      <div className="mb-6">
-        <Link
-          href="/job-orders"
-          className="text-sm font-medium text-slate-500 hover:text-slate-900"
-        >
-          ← Back to Job Orders
-        </Link>
+      {/* SECTION: Back Link */}
 
-        <div className="mt-4 flex flex-col gap-4 rounded-xl border border-slate-200 bg-white p-6 shadow-sm md:flex-row md:items-center md:justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-slate-950">{job.title}</h1>
-            <p className="text-slate-500">{job.client}</p>
-          </div>
+      <Link
+        href="/job-orders"
+        className="text-sm font-medium text-slate-500 hover:text-slate-900"
+      >
+        ← Back to Job Orders
+      </Link>
 
-          <div className="flex gap-2">
-            <StatusBadge status={job.status} />
-            <StatusBadge status={job.priority} />
-          </div>
+      {/* SECTION: Job Header */}
+
+      <div className="mt-4 flex flex-col gap-4 rounded-xl border border-slate-200 bg-white p-6 shadow-sm md:flex-row md:items-center md:justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-950">{job.title}</h1>
+          <p className="text-slate-500">{job.client}</p>
+        </div>
+
+        <div className="flex flex-wrap gap-2">
+          <StatusBadge status={job.status} />
+          <StatusBadge status={job.priority} />
         </div>
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-3">
-        <section className="xl:col-span-2 space-y-6">
+      {/* SECTION: Job Actions */}
+
+      <div className="mt-6 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+        <h2 className="mb-4 text-lg font-semibold text-slate-950">
+          Job Actions
+        </h2>
+
+        <div className="flex flex-wrap gap-3">
+          <button className="rounded-lg bg-slate-950 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800">
+            Edit Job Order
+          </button>
+
+          <button className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
+            Add Candidate
+          </button>
+
+          <button className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
+            Submit Candidate
+          </button>
+
+          <button className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
+            Close Job
+          </button>
+        </div>
+      </div>
+
+      <div className="mt-6 grid gap-6 xl:grid-cols-3">
+        <section className="space-y-6 xl:col-span-2">
+          {/* SECTION: Job Overview */}
+
           <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
             <h2 className="text-lg font-semibold text-slate-950">
               Job Overview
             </h2>
 
             <div className="mt-6 grid gap-4 md:grid-cols-2">
+              <Info label="Client" value={job.client} />
               <Info label="Location" value={job.location} />
               <Info label="Salary Range" value={job.salaryRange} />
               <Info label="Assigned Recruiter" value={job.assignedRecruiter} />
               <Info label="Candidates Submitted" value={String(job.candidates)} />
+              <Info label="Priority" value={job.priority} />
             </div>
 
-            <p className="mt-6 text-sm leading-6 text-slate-600">
-              {job.description}
-            </p>
+            <div className="mt-6 rounded-lg bg-slate-50 p-4">
+              <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
+                Description
+              </p>
+              <p className="mt-2 text-sm leading-6 text-slate-700">
+                {job.description}
+              </p>
+            </div>
           </div>
 
-          <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h2 className="text-lg font-semibold text-slate-950">
-              Submitted Candidates
-            </h2>
+          {/* SECTION: Submitted Candidates */}
 
-            <div className="mt-4 space-y-3">
+          <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-lg font-semibold text-slate-950">
+                Submitted Candidates
+              </h2>
+
+              <button className="rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
+                Add Candidate
+              </button>
+            </div>
+
+            <div className="space-y-3">
               {candidates.map((candidate) => (
                 <Link
                   href={`/candidates/${candidate.id}`}
@@ -85,24 +132,62 @@ export default async function JobOrderDetailPage({ params }: JobOrderDetailPageP
               ))}
             </div>
           </div>
+
+          {/* SECTION: Job Activity */}
+
+          <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+            <h2 className="mb-4 text-lg font-semibold text-slate-950">
+              Job Activity
+            </h2>
+
+            <div className="space-y-4">
+              <Activity
+                title="Candidate submitted"
+                description="Amanda Pierce was submitted for review."
+                time="2 hours ago"
+              />
+
+              <Activity
+                title="Client update"
+                description="Client requested additional candidates with multi-unit leadership experience."
+                time="Yesterday"
+              />
+
+              <Activity
+                title="Job order created"
+                description="Regional Operations Manager job order was added."
+                time="3 days ago"
+              />
+            </div>
+          </div>
         </section>
 
         <aside className="space-y-6">
+          {/* SECTION: Job Status */}
+
           <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
             <h2 className="text-lg font-semibold text-slate-950">
-              Quick Actions
+              Job Status
             </h2>
 
-            <div className="mt-4 space-y-3">
-              <button className="w-full rounded-lg bg-slate-950 px-4 py-2 text-sm font-medium text-white">
-                Add Candidate
-              </button>
-              <button className="w-full rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700">
-                Update Status
-              </button>
-              <button className="w-full rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700">
-                Add Note
-              </button>
+            <div className="mt-4 space-y-3 text-sm text-slate-600">
+              <p>Status: {job.status}</p>
+              <p>Priority: {job.priority}</p>
+              <p>Recruiter: {job.assignedRecruiter}</p>
+            </div>
+          </div>
+
+          {/* SECTION: Quick Metrics */}
+
+          <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+            <h2 className="text-lg font-semibold text-slate-950">
+              Quick Metrics
+            </h2>
+
+            <div className="mt-4 grid gap-3">
+              <Metric label="Submitted" value={String(job.candidates)} />
+              <Metric label="Interviewing" value="3" />
+              <Metric label="Offers" value="1" />
             </div>
           </div>
         </aside>
@@ -118,6 +203,33 @@ function Info({ label, value }: { label: string; value: string }) {
         {label}
       </p>
       <p className="mt-1 font-medium text-slate-900">{value}</p>
+    </div>
+  );
+}
+
+function Metric({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-lg bg-slate-50 p-4">
+      <p className="text-xs text-slate-500">{label}</p>
+      <p className="mt-1 text-2xl font-bold text-slate-950">{value}</p>
+    </div>
+  );
+}
+
+function Activity({
+  title,
+  description,
+  time,
+}: {
+  title: string;
+  description: string;
+  time: string;
+}) {
+  return (
+    <div className="rounded-lg border border-slate-100 bg-slate-50 p-4">
+      <p className="font-medium text-slate-950">{title}</p>
+      <p className="mt-1 text-sm text-slate-600">{description}</p>
+      <p className="mt-2 text-xs text-slate-400">{time}</p>
     </div>
   );
 }

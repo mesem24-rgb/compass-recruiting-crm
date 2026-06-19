@@ -158,3 +158,35 @@ export const clients = [
     ],
   },
 ];
+
+export const quickActions = [
+  { label: "Add Candidate", description: "Create a new candidate profile" },
+  { label: "New Job Order", description: "Add a new open role" },
+  { label: "Add Client", description: "Create a new client record" },
+];
+
+export const recentActivities = [
+  {
+    title: "Amanda Pierce moved to Interview",
+    description: "Michael Sullivan updated candidate status",
+    time: "2 hours ago",
+  },
+  {
+    title: "James Carter submitted to client",
+    description: "Submitted to National Food Service Group",
+    time: "5 hours ago",
+  },
+  {
+    title: "Rachel Nguyen qualified",
+    description: "Candidate moved into qualified pipeline",
+    time: "Yesterday",
+  },
+];
+
+export const candidateStatusSummary = [
+  { label: "Qualified", value: 34 },
+  { label: "Submitted", value: 28 },
+  { label: "Interview", value: 18 },
+  { label: "Offer", value: 9 },
+  { label: "Placed", value: 7 },
+];

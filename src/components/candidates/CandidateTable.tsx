@@ -138,7 +138,7 @@ export default function CandidateTable() {
 
       {filteredCandidates.length === 0 && (
         <div className="rounded-xl border border-slate-200 bg-white p-6 text-center text-sm text-slate-500">
-          No candidates found.
+          No candidates match your current filters.
         </div>
       )}
     </>
