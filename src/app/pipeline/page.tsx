@@ -1,18 +1,39 @@
+import Link from "next/link";
 import AppShell from "@/components/layout/AppShell";
 import PageHeader from "@/components/ui/PageHeader";
 import StatusBadge from "@/components/ui/StatusBadge";
-import { candidates } from "@/lib/data";
+import { getCandidates } from "@/lib/candidates";
 
-const stages = ["New Lead", "Qualified", "Submitted", "Interview", "Offer", "Placed"];
-
-const pipelineSummary = [
-  { label: "Total Candidates", value: "126" },
-  { label: "In Interviews", value: "18" },
-  { label: "Offers Pending", value: "9" },
-  { label: "Placements", value: "7" },
+const stages = [
+  "New Lead",
+  "Qualified",
+  "Submitted",
+  "Interview",
+  "Offer",
+  "Placed",
 ];
 
-export default function PipelinePage() {
+export default async function PipelinePage() {
+  const candidates = await getCandidates();
+
+  const totalCandidates = candidates.length;
+  const interviews = candidates.filter(
+    (candidate) => candidate.status === "Interview",
+  ).length;
+  const offers = candidates.filter(
+    (candidate) => candidate.status === "Offer",
+  ).length;
+  const placements = candidates.filter(
+    (candidate) => candidate.status === "Placed",
+  ).length;
+
+  const pipelineSummary = [
+    { label: "Total Candidates", value: String(totalCandidates) },
+    { label: "In Interviews", value: String(interviews) },
+    { label: "Offers Pending", value: String(offers) },
+    { label: "Placements", value: String(placements) },
+  ];
+
   return (
     <AppShell>
       {/* SECTION: Page Header */}
@@ -44,7 +65,7 @@ export default function PipelinePage() {
         <div className="grid min-w-[1100px] gap-4 xl:grid-cols-6">
           {stages.map((stage) => {
             const stageCandidates = candidates.filter(
-              (candidate) => candidate.status === stage,
+              (candidate) => (candidate.status ?? "Qualified") === stage,
             );
 
             return (
@@ -67,9 +88,10 @@ export default function PipelinePage() {
                 <div className="space-y-3">
                   {stageCandidates.length > 0 ? (
                     stageCandidates.map((candidate) => (
-                      <div
+                      <Link
+                        href={`/candidates/${candidate.id}`}
                         key={candidate.id}
-                        className="rounded-lg border border-slate-200 bg-white p-3 shadow-sm"
+                        className="block rounded-lg border border-slate-200 bg-white p-3 shadow-sm hover:bg-slate-50"
                       >
                         <div className="mb-3 flex items-start justify-between gap-2">
                           <div>
@@ -77,19 +99,22 @@ export default function PipelinePage() {
                               {candidate.name}
                             </p>
                             <p className="text-sm text-slate-500">
-                              {candidate.role}
+                              {candidate.role ?? "No role listed"}
                             </p>
                           </div>
 
-                          <StatusBadge status={candidate.status} />
+                          <StatusBadge status={candidate.status ?? "Qualified"} />
                         </div>
 
                         <div className="space-y-1 text-xs text-slate-500">
-                          <p>{candidate.location}</p>
-                          <p>Recruiter: {candidate.recruiter}</p>
-                          <p>Last Contact: {candidate.lastContact}</p>
+                          <p>{candidate.location ?? "No location listed"}</p>
+                          <p>Recruiter: {candidate.recruiter ?? "Unassigned"}</p>
+                          <p>
+                            Created:{" "}
+                            {new Date(candidate.created_at).toLocaleDateString()}
+                          </p>
                         </div>
-                      </div>
+                      </Link>
                     ))
                   ) : (
                     <div className="rounded-lg border border-dashed border-slate-300 bg-white/60 p-4 text-center text-sm text-slate-400">
