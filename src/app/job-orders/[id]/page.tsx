@@ -4,6 +4,8 @@ import AppShell from "@/components/layout/AppShell";
 import StatusBadge from "@/components/ui/StatusBadge";
 import { candidates } from "@/lib/data";
 import { getJobOrderById } from "@/lib/job-orders";
+import DeleteJobOrderButton from "@/components/job-orders/DeleteJobOrderButton";
+import EditJobOrderButton from "@/components/job-orders/EditJobOrderButton";
 
 type JobOrderDetailPageProps = {
   params: Promise<{
@@ -55,9 +57,7 @@ export default async function JobOrderDetailPage({
         </h2>
 
         <div className="flex flex-wrap gap-3">
-          <button className="rounded-lg bg-slate-950 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800">
-            Edit Job Order
-          </button>
+          <EditJobOrderButton jobOrder={job} />
 
           <button className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
             Add Candidate
@@ -70,6 +70,7 @@ export default async function JobOrderDetailPage({
           <button className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
             Close Job
           </button>
+          <DeleteJobOrderButton jobOrderId={job.id} />
         </div>
       </div>
 
