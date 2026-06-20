@@ -138,3 +138,16 @@ export async function deleteCandidateNote(id: string) {
     throw new Error(error.message);
   }
 }
+
+/* SECTION: Update Candidate Status */
+
+export async function updateCandidateStatus(id: string, status: string) {
+  const { error } = await supabase
+    .from("candidates")
+    .update({ status })
+    .eq("id", id);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}
