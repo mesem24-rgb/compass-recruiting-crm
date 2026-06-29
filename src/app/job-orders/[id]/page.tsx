@@ -2,10 +2,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import AppShell from "@/components/layout/AppShell";
 import StatusBadge from "@/components/ui/StatusBadge";
-import { candidates } from "@/lib/data";
+import JobOrderActions from "@/components/job-orders/JobOrderActions";
+import { getCandidates } from "@/lib/candidates";
 import { getJobOrderById } from "@/lib/job-orders";
-import DeleteJobOrderButton from "@/components/job-orders/DeleteJobOrderButton";
-import EditJobOrderButton from "@/components/job-orders/EditJobOrderButton";
+import { getSubmissionsForJobOrder } from "@/lib/submissions";
 
 type JobOrderDetailPageProps = {
   params: Promise<{
@@ -23,6 +23,11 @@ export default async function JobOrderDetailPage({
   if (!job) {
     notFound();
   }
+
+  const [liveCandidates, submissions] = await Promise.all([
+    getCandidates(),
+    getSubmissionsForJobOrder(id),
+  ]);
 
   return (
     <AppShell>
@@ -51,28 +56,7 @@ export default async function JobOrderDetailPage({
 
       {/* SECTION: Job Actions */}
 
-      <div className="mt-6 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-        <h2 className="mb-4 text-lg font-semibold text-slate-950">
-          Job Actions
-        </h2>
-
-        <div className="flex flex-wrap gap-3">
-          <EditJobOrderButton jobOrder={job} />
-
-          <button className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
-            Add Candidate
-          </button>
-
-          <button className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
-            Submit Candidate
-          </button>
-
-          <button className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
-            Close Job
-          </button>
-          <DeleteJobOrderButton jobOrderId={job.id} />
-        </div>
-      </div>
+      <JobOrderActions jobOrder={job} candidates={liveCandidates} />
 
       <div className="mt-6 grid gap-6 xl:grid-cols-3">
         <section className="space-y-6 xl:col-span-2">
@@ -101,7 +85,7 @@ export default async function JobOrderDetailPage({
               />
               <Info
                 label="Candidates Submitted"
-                value={String(job.candidates ?? 0)}
+                value={String(submissions.length)}
               />
               <Info
                 label="Created"
@@ -122,33 +106,41 @@ export default async function JobOrderDetailPage({
           {/* SECTION: Submitted Candidates */}
 
           <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-slate-950">
-                Submitted Candidates
-              </h2>
-
-              <button className="rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
-                Add Candidate
-              </button>
-            </div>
+            <h2 className="mb-4 text-lg font-semibold text-slate-950">
+              Submitted Candidates
+            </h2>
 
             <div className="space-y-3">
-              {candidates.map((candidate) => (
-                <Link
-                  href={`/candidates/${candidate.id}`}
-                  key={candidate.id}
-                  className="flex items-center justify-between rounded-lg border border-slate-100 bg-slate-50 p-4 hover:bg-slate-100"
-                >
-                  <div>
-                    <p className="font-medium text-slate-950">
-                      {candidate.name}
-                    </p>
-                    <p className="text-sm text-slate-500">{candidate.role}</p>
-                  </div>
+              {submissions.length > 0 ? (
+                submissions.map((submission) => {
+                  const candidate = submission.candidates;
 
-                  <StatusBadge status={candidate.status} />
-                </Link>
-              ))}
+                  if (!candidate) return null;
+
+                  return (
+                    <Link
+                      href={`/candidates/${candidate.id}`}
+                      key={submission.id}
+                      className="flex items-center justify-between rounded-lg border border-slate-100 bg-slate-50 p-4 hover:bg-slate-100"
+                    >
+                      <div>
+                        <p className="font-medium text-slate-950">
+                          {candidate.name}
+                        </p>
+                        <p className="text-sm text-slate-500">
+                          {candidate.role ?? "No role listed"}
+                        </p>
+                      </div>
+
+                      <StatusBadge status={submission.stage ?? "Submitted"} />
+                    </Link>
+                  );
+                })
+              ) : (
+                <div className="rounded-lg border border-dashed border-slate-300 bg-slate-50 p-4 text-sm text-slate-500">
+                  No candidates have been submitted to this job yet.
+                </div>
+              )}
             </div>
           </div>
 
@@ -168,8 +160,8 @@ export default async function JobOrderDetailPage({
 
               <Activity
                 title="Candidate submissions"
-                description="Candidate submission tracking will be connected in a future phase."
-                time="Coming soon"
+                description={`${submissions.length} candidate(s) currently submitted.`}
+                time="Live data"
               />
             </div>
           </div>
@@ -198,7 +190,7 @@ export default async function JobOrderDetailPage({
             </h2>
 
             <div className="mt-4 grid gap-3">
-              <Metric label="Submitted" value={String(job.candidates ?? 0)} />
+              <Metric label="Submitted" value={String(submissions.length)} />
               <Metric label="Interviewing" value="0" />
               <Metric label="Offers" value="0" />
             </div>
