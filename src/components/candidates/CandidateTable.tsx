@@ -101,14 +101,13 @@ export default function CandidateTable({ candidates }: CandidateTableProps) {
           placeholder="Search location..."
           className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 placeholder:text-slate-500 outline-none focus:border-slate-400"
         />
-
-        <label className="flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700">
+        <label className="flex min-w-[200px] items-center gap-2 rounded-lg border border-slate-200 px-4 py-2 text-sm text-slate-700">
           <input
             type="checkbox"
             checked={relocationOnly}
             onChange={(event) => setRelocationOnly(event.target.checked)}
           />
-          Willing to relocate
+          <span>Willing to relocate</span>
         </label>
 
         <select
@@ -183,7 +182,7 @@ export default function CandidateTable({ candidates }: CandidateTableProps) {
               <th className="px-4 py-3">Status</th>
               <th className="px-4 py-3">Recruiter</th>
               <th className="px-4 py-3">Location</th>
-              
+
               <th className="px-4 py-3">Created</th>
             </tr>
           </thead>
@@ -208,8 +207,8 @@ export default function CandidateTable({ candidates }: CandidateTableProps) {
                 </td>
 
                 <td className="px-4 py-3">
-                <SkillBadges candidate={candidate} compact />
-              </td>
+                  <SkillBadges candidate={candidate} compact />
+                </td>
 
                 <td className="px-4 py-3">
                   <StatusBadge status={candidate.status ?? "Qualified"} />

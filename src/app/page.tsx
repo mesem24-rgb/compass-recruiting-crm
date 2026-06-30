@@ -1,248 +1,111 @@
-import Link from "next/link";
-import AppShell from "@/components/layout/AppShell";
-import StatCard from "@/components/dashboard/StatCard";
-import StatusBadge from "@/components/ui/StatusBadge";
-import { getCandidates } from "@/lib/candidates";
-import { getClients } from "@/lib/clients";
-import { getJobOrders } from "@/lib/job-orders";
+"use client";
 
-export default async function DashboardPage() {
-  const [candidates, clients, jobOrders] = await Promise.all([
-    getCandidates(),
-    getClients(),
-    getJobOrders(),
-  ]);
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
-  const interviews = candidates.filter(
-    (candidate) => candidate.status === "Interview",
-  ).length;
+const loadingSteps = [
+  "Initializing Workspace",
+  "Loading Candidates",
+  "Loading Clients",
+  "Loading Job Orders",
+  "Preparing Pipeline",
+];
 
-  const placements = candidates.filter(
-    (candidate) => candidate.status === "Placed",
-  ).length;
+export default function LandingPage() {
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
 
-  const openJobs = jobOrders.filter(
-    (job) => (job.status ?? "Open") === "Open",
-  ).length;
+  function enterDemo() {
+    setLoading(true);
 
-  const dashboardStats = [
-    { label: "Open Positions", value: String(openJobs), change: "Live job orders" },
-    {
-      label: "Candidates",
-      value: String(candidates.length),
-      change: "Total candidate records",
-    },
-    {
-      label: "Interviews",
-      value: String(interviews),
-      change: "Candidates in interview stage",
-    },
-    {
-      label: "Placements",
-      value: String(placements),
-      change: "Placed candidates",
-    },
-  ];
-
-  const candidateStatusSummary = [
-    "New Lead",
-    "Qualified",
-    "Submitted",
-    "Interview",
-    "Offer",
-    "Placed",
-  ].map((status) => ({
-    label: status,
-    value: candidates.filter(
-      (candidate) => (candidate.status ?? "Qualified") === status,
-    ).length,
-  }));
-
-  const recentCandidates = candidates.slice(0, 3);
-  const recentJobs = jobOrders.slice(0, 3);
+    setTimeout(() => {
+      router.push("/dashboard");
+    }, 2800);
+  }
 
   return (
-    <AppShell>
-      {/* SECTION: Dashboard Header */}
+    <main className="flex min-h-screen items-center justify-center bg-slate-950 px-6 text-white">
+      <section className="w-full max-w-xl rounded-3xl border border-slate-800 bg-slate-900/80 p-8 text-center shadow-2xl">
+        {/* SECTION: Compass Logo */}
 
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-slate-950">Dashboard</h1>
-        <p className="text-slate-500">
-          Live overview of candidates, clients, jobs, interviews, and placements.
+        <div className="mx-auto mb-6 w-fit rounded-2xl bg-white p-4 shadow-xl">
+          <Image
+            src="/compass-logo.jpg"
+            alt="Compass Group Recruiting"
+            width={200}
+            height={120}
+            className="h-auto w-auto"
+            priority
+          />
+        </div>
+
+        {/* SECTION: Title */}
+
+        <p className="text-xs font-medium uppercase tracking-[0.35em] text-slate-400">
+          Compass Group
         </p>
-      </div>
 
-      {/* SECTION: Quick Actions */}
+        <h1 className="mt-3 text-3xl font-bold">
+          Recruiting CRM Platform
+        </h1>
 
-      <section className="mb-6 grid gap-4 md:grid-cols-3">
-        <Link
-          href="/candidates"
-          className="rounded-xl border border-slate-200 bg-white p-5 text-left shadow-sm transition hover:-translate-y-1 hover:shadow-md"
-        >
-          <p className="font-semibold text-slate-950">Add Candidate</p>
-          <p className="mt-1 text-sm text-slate-500">
-            Create and manage candidate records.
+        <p className="mt-3 text-sm leading-6 text-slate-400">
+          Candidate management, client tracking, job orders, submissions, and
+          drag-and-drop hiring pipeline.
+        </p>
+
+        {/* SECTION: Builder Logo */}
+
+        <div className="mt-8 border-t border-slate-800 pt-6">
+          <p className="mb-3 text-xs uppercase tracking-[0.25em] text-slate-500">
+            Powered by
           </p>
-        </Link>
 
-        <Link
-          href="/job-orders"
-          className="rounded-xl border border-slate-200 bg-white p-5 text-left shadow-sm transition hover:-translate-y-1 hover:shadow-md"
-        >
-          <p className="font-semibold text-slate-950">New Job Order</p>
-          <p className="mt-1 text-sm text-slate-500">
-            Add and manage open recruiting assignments.
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-white text-lg font-bold text-slate-950 shadow-lg">
+            MS
+          </div>
+
+          <p className="mt-3 text-sm text-slate-400">
+            Built by Michael Sullivan
           </p>
-        </Link>
+        </div>
 
-        <Link
-          href="/clients"
-          className="rounded-xl border border-slate-200 bg-white p-5 text-left shadow-sm transition hover:-translate-y-1 hover:shadow-md"
-        >
-          <p className="font-semibold text-slate-950">Add Client</p>
-          <p className="mt-1 text-sm text-slate-500">
-            Create and manage client accounts.
-          </p>
-        </Link>
-      </section>
+        {/* SECTION: Demo Loading State */}
 
-      {/* SECTION: KPI Cards */}
+        {loading ? (
+          <div className="mt-8 text-left">
+            <p className="mb-3 text-center text-sm font-medium text-slate-300">
+              Loading Workspace...
+            </p>
 
-      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        {dashboardStats.map((stat) => (
-          <StatCard key={stat.label} {...stat} />
-        ))}
-      </section>
+            <div className="mb-5 h-2 overflow-hidden rounded-full bg-slate-800">
+              <div className="h-full w-2/3 animate-pulse rounded-full bg-white" />
+            </div>
 
-      {/* SECTION: Analytics and Activity */}
-
-      <section className="mt-6 grid gap-6 xl:grid-cols-3">
-        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm xl:col-span-2">
-          <h2 className="mb-4 text-lg font-semibold text-slate-950">
-            Candidates by Status
-          </h2>
-
-          <div className="space-y-4">
-            {candidateStatusSummary.map((item) => {
-              const width =
-                candidates.length === 0
-                  ? 0
-                  : Math.max((item.value / candidates.length) * 100, 5);
-
-              return (
-                <div key={item.label}>
-                  <div className="mb-1 flex items-center justify-between text-sm">
-                    <span className="font-medium text-slate-700">
-                      {item.label}
-                    </span>
-                    <span className="text-slate-500">{item.value}</span>
-                  </div>
-
-                  <div className="h-2 rounded-full bg-slate-100">
-                    <div
-                      className="h-2 rounded-full bg-slate-950"
-                      style={{ width: `${width}%` }}
-                    />
-                  </div>
+            <div className="space-y-2">
+              {loadingSteps.map((step) => (
+                <div
+                  key={step}
+                  className="flex items-center gap-2 text-sm text-slate-400"
+                >
+                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500 text-xs text-white">
+                    ✓
+                  </span>
+                  {step}
                 </div>
-              );
-            })}
+              ))}
+            </div>
           </div>
-        </div>
-
-        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-          <h2 className="mb-4 text-lg font-semibold text-slate-950">
-            Account Summary
-          </h2>
-
-          <div className="space-y-4">
-            <SummaryRow label="Clients" value={clients.length} />
-            <SummaryRow label="Job Orders" value={jobOrders.length} />
-            <SummaryRow label="Candidates" value={candidates.length} />
-          </div>
-        </div>
+        ) : (
+          <button
+            onClick={enterDemo}
+            className="mt-8 w-full rounded-xl bg-white px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-slate-200"
+          >
+            Enter Demo CRM
+          </button>
+        )}
       </section>
-
-      {/* SECTION: Recent Records */}
-
-      <section className="mt-6 grid gap-6 xl:grid-cols-2">
-        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-          <h2 className="mb-4 text-lg font-semibold text-slate-950">
-            Recent Candidates
-          </h2>
-
-          <div className="space-y-3">
-            {recentCandidates.length > 0 ? (
-              recentCandidates.map((candidate) => (
-                <Link
-                  href={`/candidates/${candidate.id}`}
-                  key={candidate.id}
-                  className="flex items-center justify-between rounded-lg border border-slate-100 p-3 hover:bg-slate-50"
-                >
-                  <div>
-                    <p className="font-medium text-slate-900">
-                      {candidate.name}
-                    </p>
-                    <p className="text-sm text-slate-500">
-                      {candidate.role ?? "No role listed"}
-                    </p>
-                  </div>
-
-                  <StatusBadge status={candidate.status ?? "Qualified"} />
-                </Link>
-              ))
-            ) : (
-              <p className="text-sm text-slate-500">
-                No candidates have been added yet.
-              </p>
-            )}
-          </div>
-        </div>
-
-        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-          <h2 className="mb-4 text-lg font-semibold text-slate-950">
-            Active Job Orders
-          </h2>
-
-          <div className="space-y-3">
-            {recentJobs.length > 0 ? (
-              recentJobs.map((job) => (
-                <Link
-                  href={`/job-orders/${job.id}`}
-                  key={job.id}
-                  className="block rounded-lg border border-slate-100 p-3 hover:bg-slate-50"
-                >
-                  <div className="flex justify-between gap-3">
-                    <p className="font-medium text-slate-900">{job.title}</p>
-                    <StatusBadge status={job.status ?? "Open"} />
-                  </div>
-
-                  <p className="text-sm text-slate-500">
-                    {job.client ?? "No client listed"}
-                  </p>
-
-                  <p className="mt-2 text-xs text-slate-400">
-                    {job.candidates ?? 0} candidates submitted
-                  </p>
-                </Link>
-              ))
-            ) : (
-              <p className="text-sm text-slate-500">
-                No job orders have been added yet.
-              </p>
-            )}
-          </div>
-        </div>
-      </section>
-    </AppShell>
-  );
-}
-
-function SummaryRow({ label, value }: { label: string; value: number }) {
-  return (
-    <div className="flex items-center justify-between rounded-lg bg-slate-50 p-4">
-      <p className="text-sm font-medium text-slate-700">{label}</p>
-      <p className="text-xl font-bold text-slate-950">{value}</p>
-    </div>
+    </main>
   );
 }
