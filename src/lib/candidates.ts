@@ -15,6 +15,11 @@ export type Candidate = {
   recruiter: string | null;
   experience: string | null;
   salary: string | null;
+  priority_skills: string[] | null;
+  secondary_skills: string[] | null;
+  keywords: string[] | null;
+  preferred_location: string | null;
+  willing_to_relocate: boolean | null;
 };
 
 /* SECTION: Candidate Queries */
@@ -71,9 +76,17 @@ export type UpdateCandidateInput = {
   recruiter: string;
   experience: string;
   salary: string;
+  priority_skills: string[];
+  secondary_skills: string[];
+  keywords: string[];
+  preferred_location: string;
+  willing_to_relocate: boolean;
 };
 
-export async function updateCandidate(id: string, candidate: UpdateCandidateInput) {
+export async function updateCandidate(
+  id: string,
+  candidate: UpdateCandidateInput,
+) {
   const { error } = await supabase
     .from("candidates")
     .update(candidate)

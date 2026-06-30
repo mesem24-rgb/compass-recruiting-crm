@@ -20,6 +20,11 @@ type CandidateFormData = {
   status: string;
   experience: string;
   notes: string;
+  priority_skills: string;
+  secondary_skills: string;
+  keywords: string;
+  preferred_location: string;
+  willing_to_relocate: boolean;
 };
 
 const initialFormData: CandidateFormData = {
@@ -34,6 +39,11 @@ const initialFormData: CandidateFormData = {
   status: "Qualified",
   experience: "",
   notes: "",
+  priority_skills: "",
+  secondary_skills: "",
+  keywords: "",
+  preferred_location: "",
+  willing_to_relocate: false,
 };
 
 export default function AddCandidateModal({
@@ -46,7 +56,7 @@ export default function AddCandidateModal({
 
   if (!open) return null;
 
-  function updateField(field: keyof CandidateFormData, value: string) {
+  function updateField(field: keyof CandidateFormData, value: string | boolean) {
     setFormData((current) => ({
       ...current,
       [field]: value,
@@ -74,6 +84,23 @@ export default function AddCandidateModal({
       recruiter: formData.recruiter,
       status: formData.status,
       experience: formData.experience,
+      priority_skills: formData.priority_skills
+        .split(",")
+        .map((skill) => skill.trim())
+        .filter(Boolean),
+
+      secondary_skills: formData.secondary_skills
+        .split(",")
+        .map((skill) => skill.trim())
+        .filter(Boolean),
+
+      keywords: formData.keywords
+        .split(",")
+        .map((keyword) => keyword.trim())
+        .filter(Boolean),
+
+      preferred_location: formData.preferred_location,
+      willing_to_relocate: formData.willing_to_relocate,
     });
 
     setIsSaving(false);
@@ -161,7 +188,13 @@ export default function AddCandidateModal({
             label="Source"
             value={formData.source}
             onChange={(value) => updateField("source", value)}
-            options={["LinkedIn", "Indeed", "Referral", "ZipRecruiter", "Other"]}
+            options={[
+              "LinkedIn",
+              "Indeed",
+              "Referral",
+              "ZipRecruiter",
+              "Other",
+            ]}
           />
 
           <Select
@@ -191,6 +224,45 @@ export default function AddCandidateModal({
             value={formData.experience}
             onChange={(value) => updateField("experience", value)}
           />
+
+          <Input
+            label="Priority Skills"
+            placeholder="Multi-unit leadership, P&L, operations"
+            value={formData.priority_skills}
+            onChange={(value) => updateField("priority_skills", value)}
+          />
+
+          <Input
+            label="Secondary Skills"
+            placeholder="Hiring, training, inventory"
+            value={formData.secondary_skills}
+            onChange={(value) => updateField("secondary_skills", value)}
+          />
+
+          <Input
+            label="Keywords"
+            placeholder="District Manager, retail, hospitality"
+            value={formData.keywords}
+            onChange={(value) => updateField("keywords", value)}
+          />
+
+          <Input
+            label="Preferred Location"
+            placeholder="Dallas, TX"
+            value={formData.preferred_location}
+            onChange={(value) => updateField("preferred_location", value)}
+          />
+
+          <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
+            <input
+              type="checkbox"
+              checked={Boolean(formData.willing_to_relocate)}
+              onChange={(event) =>
+                updateField("willing_to_relocate", event.target.checked)
+              }
+            />
+            Willing to relocate
+          </label>
 
           <div className="md:col-span-2">
             <label className="mb-2 block text-sm font-medium text-slate-700">

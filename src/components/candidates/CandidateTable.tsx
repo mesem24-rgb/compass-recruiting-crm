@@ -13,6 +13,9 @@ export default function CandidateTable({ candidates }: CandidateTableProps) {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("All Statuses");
   const [recruiter, setRecruiter] = useState("All Recruiters");
+  const [skillSearch, setSkillSearch] = useState("");
+  const [locationSearch, setLocationSearch] = useState("");
+  const [relocationOnly, setRelocationOnly] = useState(false);
 
   const filteredCandidates = useMemo(() => {
     return candidates.filter((candidate) => {
@@ -20,6 +23,28 @@ export default function CandidateTable({ candidates }: CandidateTableProps) {
       const location = candidate.location ?? "";
       const candidateStatus = candidate.status ?? "Qualified";
       const candidateRecruiter = candidate.recruiter ?? "Unassigned";
+      const prioritySkills = candidate.priority_skills ?? [];
+      const secondarySkills = candidate.secondary_skills ?? [];
+      const keywords = candidate.keywords ?? [];
+
+      const matchesSkills =
+        !skillSearch ||
+        [...prioritySkills, ...secondarySkills, ...keywords]
+          .join(" ")
+          .toLowerCase()
+          .includes(skillSearch.toLowerCase());
+
+      const matchesLocation =
+        !locationSearch ||
+        candidate.location
+          ?.toLowerCase()
+          .includes(locationSearch.toLowerCase()) ||
+        candidate.preferred_location
+          ?.toLowerCase()
+          .includes(locationSearch.toLowerCase());
+
+      const matchesRelocation =
+        !relocationOnly || candidate.willing_to_relocate === true;
 
       const matchesSearch =
         candidate.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -32,21 +57,59 @@ export default function CandidateTable({ candidates }: CandidateTableProps) {
       const matchesRecruiter =
         recruiter === "All Recruiters" || candidateRecruiter === recruiter;
 
-      return matchesSearch && matchesStatus && matchesRecruiter;
+      return (
+        matchesSearch &&
+        matchesStatus &&
+        matchesRecruiter &&
+        matchesSkills &&
+        matchesLocation &&
+        matchesRelocation
+      );
     });
-  }, [candidates, search, status, recruiter]);
+  }, [
+    candidates,
+    search,
+    status,
+    recruiter,
+    skillSearch,
+    locationSearch,
+    relocationOnly,
+  ]);
 
   return (
     <>
       {/* SECTION: Candidate Filters */}
 
-      <div className="mb-4 flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm lg:flex-row">
+      <div className="mb-4 flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm xl:flex-row">
         <input
           value={search}
           onChange={(event) => setSearch(event.target.value)}
           placeholder="Search candidates..."
           className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 placeholder:text-slate-500 outline-none focus:border-slate-400"
         />
+
+        <input
+          value={skillSearch}
+          onChange={(event) => setSkillSearch(event.target.value)}
+          placeholder="Search skills or keywords..."
+          className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 placeholder:text-slate-500 outline-none focus:border-slate-400"
+        />
+
+        <input
+          value={locationSearch}
+          onChange={(event) => setLocationSearch(event.target.value)}
+          placeholder="Search location..."
+          className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 placeholder:text-slate-500 outline-none focus:border-slate-400"
+        />
+
+        <label className="flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700">
+          <input
+            type="checkbox"
+            checked={relocationOnly}
+            onChange={(event) => setRelocationOnly(event.target.checked)}
+          />
+          Willing to relocate
+        </label>
 
         <select
           value={status}
@@ -98,10 +161,12 @@ export default function CandidateTable({ candidates }: CandidateTableProps) {
               <p>Recruiter: {candidate.recruiter ?? "Unassigned"}</p>
               <p>Location: {candidate.location ?? "No location listed"}</p>
               <p>
-                Created:{" "}
-                {new Date(candidate.created_at).toLocaleDateString()}
+                Created: {new Date(candidate.created_at).toLocaleDateString()}
               </p>
             </div>
+            {/* SECTION: Candidate Skill Badges */}
+
+            <SkillBadges candidate={candidate} />
           </Link>
         ))}
       </div>
@@ -114,9 +179,11 @@ export default function CandidateTable({ candidates }: CandidateTableProps) {
             <tr>
               <th className="px-4 py-3">Candidate</th>
               <th className="px-4 py-3">Position</th>
+              <th className="px-4 py-3">Skills</th>
               <th className="px-4 py-3">Status</th>
               <th className="px-4 py-3">Recruiter</th>
               <th className="px-4 py-3">Location</th>
+              
               <th className="px-4 py-3">Created</th>
             </tr>
           </thead>
@@ -139,6 +206,10 @@ export default function CandidateTable({ candidates }: CandidateTableProps) {
                 <td className="px-4 py-3 text-slate-600">
                   {candidate.role ?? "No role listed"}
                 </td>
+
+                <td className="px-4 py-3">
+                <SkillBadges candidate={candidate} compact />
+              </td>
 
                 <td className="px-4 py-3">
                   <StatusBadge status={candidate.status ?? "Qualified"} />
@@ -169,5 +240,33 @@ export default function CandidateTable({ candidates }: CandidateTableProps) {
         </div>
       )}
     </>
+  );
+}
+
+function SkillBadges({
+  candidate,
+  compact = false,
+}: {
+  candidate: Candidate;
+  compact?: boolean;
+}) {
+  const skills = [
+    ...(candidate.priority_skills ?? []),
+    ...(candidate.secondary_skills ?? []),
+  ].slice(0, compact ? 3 : 5);
+
+  if (skills.length === 0) return null;
+
+  return (
+    <div className="mt-3 flex flex-wrap gap-2">
+      {skills.map((skill) => (
+        <span
+          key={skill}
+          className="rounded-full bg-slate-100 px-2 py-1 text-xs font-medium text-slate-600"
+        >
+          {skill}
+        </span>
+      ))}
+    </div>
   );
 }

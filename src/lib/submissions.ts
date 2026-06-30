@@ -91,3 +91,44 @@ export async function deleteCandidateSubmission(id: string) {
     throw new Error(error.message);
   }
 }
+
+/* SECTION: Candidate Submission With Job Order */
+
+export type CandidateSubmissionWithJobOrder = CandidateSubmission & {
+  job_orders: {
+    id: string;
+    title: string;
+    client: string | null;
+    status: string | null;
+    priority: string | null;
+  } | null;
+};
+
+/* SECTION: Get Submissions For Candidate */
+
+export async function getSubmissionsForCandidate(
+  candidateId: string,
+): Promise<CandidateSubmissionWithJobOrder[]> {
+  const { data, error } = await supabase
+    .from("candidate_submissions")
+    .select(
+      `
+      *,
+      job_orders (
+        id,
+        title,
+        client,
+        status,
+        priority
+      )
+    `,
+    )
+    .eq("candidate_id", candidateId)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data ?? [];
+}

@@ -7,6 +7,7 @@ import EditCandidateButton from "@/components/candidates/EditCandidateButton";
 import AddCandidateNote from "@/components/candidates/AddCandidateNote";
 import { getCandidateById, getCandidateNotes } from "@/lib/candidates";
 import DeleteCandidateNoteButton from "@/components/candidates/DeleteCandidateNoteButton";
+import { getSubmissionsForCandidate } from "@/lib/submissions";
 
 type CandidateDetailPageProps = {
   params: Promise<{
@@ -21,6 +22,7 @@ export default async function CandidateDetailPage({
 
   const candidate = await getCandidateById(id);
   const notes = await getCandidateNotes(id);
+  const submissions = await getSubmissionsForCandidate(id);
 
   if (!candidate) {
     notFound();
@@ -141,6 +143,54 @@ export default async function CandidateDetailPage({
                     <p className="text-sm font-medium text-slate-700">{step}</p>
                   </div>
                 ),
+              )}
+            </div>
+          </div>
+
+          {/* SECTION: Active Submissions */}
+
+          <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+            <h2 className="mb-4 text-lg font-semibold text-slate-950">
+              Active Submissions
+            </h2>
+
+            <div className="space-y-3">
+              {submissions.length > 0 ? (
+                submissions.map((submission) => {
+                  const job = submission.job_orders;
+
+                  if (!job) return null;
+
+                  return (
+                    <Link
+                      href={`/job-orders/${job.id}`}
+                      key={submission.id}
+                      className="block rounded-lg border border-slate-100 bg-slate-50 p-4 hover:bg-slate-100"
+                    >
+                      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                        <div>
+                          <p className="font-medium text-slate-950">
+                            {job.title}
+                          </p>
+                          <p className="text-sm text-slate-500">
+                            {job.client ?? "No client listed"}
+                          </p>
+                        </div>
+
+                        <div className="flex gap-2">
+                          <StatusBadge
+                            status={submission.stage ?? "Submitted"}
+                          />
+                          <StatusBadge status={job.priority ?? "Medium"} />
+                        </div>
+                      </div>
+                    </Link>
+                  );
+                })
+              ) : (
+                <div className="rounded-lg border border-dashed border-slate-300 bg-slate-50 p-4 text-sm text-slate-500">
+                  This candidate has not been submitted to any job orders yet.
+                </div>
               )}
             </div>
           </div>

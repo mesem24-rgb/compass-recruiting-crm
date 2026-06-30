@@ -27,20 +27,47 @@ export default function EditCandidateButton({
     recruiter: candidate.recruiter ?? "Michael Sullivan",
     experience: candidate.experience ?? "",
     salary: candidate.salary ?? "",
+    priority_skills: candidate.priority_skills?.join(", ") ?? "",
+    secondary_skills: candidate.secondary_skills?.join(", ") ?? "",
+    keywords: candidate.keywords?.join(", ") ?? "",
+    preferred_location: candidate.preferred_location ?? "",
+    willing_to_relocate: candidate.willing_to_relocate ?? false,
   });
 
-  function updateField(field: keyof typeof formData, value: string) {
+  function updateField(field: keyof typeof formData, value: string | boolean) {
     setFormData((current) => ({ ...current, [field]: value }));
   }
 
   async function handleSave() {
-    setIsSaving(true);
+    try {
+      setIsSaving(true);
 
-    await updateCandidate(candidate.id, formData);
+      await updateCandidate(candidate.id, {
+        ...formData,
+        priority_skills: formData.priority_skills
+          .split(",")
+          .map((skill) => skill.trim())
+          .filter(Boolean),
+        secondary_skills: formData.secondary_skills
+          .split(",")
+          .map((skill) => skill.trim())
+          .filter(Boolean),
+        keywords: formData.keywords
+          .split(",")
+          .map((keyword) => keyword.trim())
+          .filter(Boolean),
+      });
 
-    setIsSaving(false);
-    setOpen(false);
-    router.refresh();
+      setOpen(false);
+      router.refresh();
+    } catch (error) {
+      console.error("Failed to update candidate:", error);
+      alert(
+        error instanceof Error ? error.message : "Failed to update candidate",
+      );
+    } finally {
+      setIsSaving(false);
+    }
   }
 
   return (
@@ -114,11 +141,55 @@ export default function EditCandidateButton({
                 onChange={(value) => updateField("salary", value)}
               />
 
+              <Input
+                label="Priority Skills"
+                value={formData.priority_skills}
+                onChange={(value) => updateField("priority_skills", value)}
+              />
+
+              <Input
+                label="Secondary Skills"
+                value={formData.secondary_skills}
+                onChange={(value) => updateField("secondary_skills", value)}
+              />
+
+              <Input
+                label="Keywords"
+                value={formData.keywords}
+                onChange={(value) => updateField("keywords", value)}
+              />
+
+              <Input
+                label="Preferred Location"
+                value={formData.preferred_location}
+                onChange={(value) => updateField("preferred_location", value)}
+              />
+
+              <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
+                <input
+                  type="checkbox"
+                  checked={formData.willing_to_relocate}
+                  onChange={(event) =>
+                    setFormData((current) => ({
+                      ...current,
+                      willing_to_relocate: event.target.checked,
+                    }))
+                  }
+                />
+                Willing to relocate
+              </label>
+
               <Select
                 label="Source"
                 value={formData.source}
                 onChange={(value) => updateField("source", value)}
-                options={["LinkedIn", "Indeed", "Referral", "ZipRecruiter", "Other"]}
+                options={[
+                  "LinkedIn",
+                  "Indeed",
+                  "Referral",
+                  "ZipRecruiter",
+                  "Other",
+                ]}
               />
 
               <Select
