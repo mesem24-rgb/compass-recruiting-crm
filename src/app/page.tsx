@@ -62,7 +62,7 @@ export default function LandingPage() {
             Powered by
           </p>
 
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-white text-lg font-bold text-slate-950 shadow-lg">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl text-lg font-bold text-slate-950 shadow-lg">
             <img src="./michael-logo.jpg" alt="MS" />
           </div>
 

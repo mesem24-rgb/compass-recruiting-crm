@@ -25,20 +25,35 @@ export default function EditJobOrderButton({
     salary_range: jobOrder.salary_range ?? "",
     assigned_recruiter: jobOrder.assigned_recruiter ?? "Michael Sullivan",
     description: jobOrder.description ?? "",
+    priority_skills: jobOrder.priority_skills?.join(", ") ?? "",
+    secondary_skills: jobOrder.secondary_skills?.join(", ") ?? "",
+    keywords: jobOrder.keywords?.join(", ") ?? "",
+    preferred_location: jobOrder.preferred_location ?? "",
+    replacement_priority: jobOrder.replacement_priority ?? false,
   });
 
-  function updateField(field: keyof typeof formData, value: string) {
+  function updateField(field: keyof typeof formData, value: string | boolean) {
     setFormData((current) => ({ ...current, [field]: value }));
   }
 
   async function handleSave() {
     setIsSaving(true);
 
-    await updateJobOrder(jobOrder.id, formData);
-
-    setIsSaving(false);
-    setOpen(false);
-    router.refresh();
+    await updateJobOrder(jobOrder.id, {
+      ...formData,
+      priority_skills: formData.priority_skills
+        .split(",")
+        .map((skill) => skill.trim())
+        .filter(Boolean),
+      secondary_skills: formData.secondary_skills
+        .split(",")
+        .map((skill) => skill.trim())
+        .filter(Boolean),
+      keywords: formData.keywords
+        .split(",")
+        .map((keyword) => keyword.trim())
+        .filter(Boolean),
+    });
   }
 
   return (

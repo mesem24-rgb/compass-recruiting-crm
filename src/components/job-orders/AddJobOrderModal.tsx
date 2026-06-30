@@ -18,6 +18,11 @@ const initialFormData = {
   salary_range: "",
   assigned_recruiter: "Michael Sullivan",
   description: "",
+  priority_skills: "",
+  secondary_skills: "",
+  keywords: "",
+  preferred_location: "",
+  replacement_priority: false,
 };
 
 export default function AddJobOrderModal({
@@ -30,7 +35,7 @@ export default function AddJobOrderModal({
 
   if (!open) return null;
 
-  function updateField(field: keyof typeof formData, value: string) {
+  function updateField(field: keyof typeof formData, value: string | boolean) {
     setFormData((current) => ({ ...current, [field]: value }));
   }
 
@@ -39,12 +44,21 @@ export default function AddJobOrderModal({
 
     setIsSaving(true);
 
-    await createJobOrder(formData);
-
-    setFormData(initialFormData);
-    setIsSaving(false);
-    onClose();
-    router.refresh();
+    await createJobOrder({
+      ...formData,
+      priority_skills: formData.priority_skills
+        .split(",")
+        .map((skill) => skill.trim())
+        .filter(Boolean),
+      secondary_skills: formData.secondary_skills
+        .split(",")
+        .map((skill) => skill.trim())
+        .filter(Boolean),
+      keywords: formData.keywords
+        .split(",")
+        .map((keyword) => keyword.trim())
+        .filter(Boolean),
+    });
   }
 
   return (
@@ -121,6 +135,45 @@ export default function AddJobOrderModal({
             onChange={(value) => updateField("assigned_recruiter", value)}
             options={["Michael Sullivan", "Hans Denton"]}
           />
+
+          <Input
+            label="Priority Skills"
+            placeholder="Multi-unit leadership, P&L, operations"
+            value={formData.priority_skills}
+            onChange={(value) => updateField("priority_skills", value)}
+          />
+
+          <Input
+            label="Secondary Skills"
+            placeholder="Hiring, training, inventory"
+            value={formData.secondary_skills}
+            onChange={(value) => updateField("secondary_skills", value)}
+          />
+
+          <Input
+            label="Keywords"
+            placeholder="Regional Manager, retail, hospitality"
+            value={formData.keywords}
+            onChange={(value) => updateField("keywords", value)}
+          />
+
+          <Input
+            label="Preferred Location"
+            placeholder="Dallas, TX"
+            value={formData.preferred_location}
+            onChange={(value) => updateField("preferred_location", value)}
+          />
+
+          <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
+            <input
+              type="checkbox"
+              checked={Boolean(formData.replacement_priority)}
+              onChange={(event) =>
+                updateField("replacement_priority", event.target.checked)
+              }
+            />
+            Replacement priority
+          </label>
 
           <div className="md:col-span-2">
             <label className="mb-2 block text-sm font-medium text-slate-700">

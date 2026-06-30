@@ -14,6 +14,11 @@ export type JobOrder = {
   assigned_recruiter: string | null;
   description: string | null;
   candidates: number | null;
+  priority_skills: string[] | null;
+  secondary_skills: string[] | null;
+  keywords: string[] | null;
+  preferred_location: string | null;
+  replacement_priority: boolean | null;
 };
 
 /* SECTION: Job Order Queries */
@@ -58,6 +63,11 @@ export type CreateJobOrderInput = {
   salary_range: string;
   assigned_recruiter: string;
   description: string;
+  priority_skills: string[];
+  secondary_skills: string[];
+  keywords: string[];
+  preferred_location: string;
+  replacement_priority: boolean;
 };
 
 export async function createJobOrder(jobOrder: CreateJobOrderInput) {
