@@ -37,23 +37,36 @@ export default function EditJobOrderButton({
   }
 
   async function handleSave() {
-    setIsSaving(true);
+    try {
+      setIsSaving(true);
 
-    await updateJobOrder(jobOrder.id, {
-      ...formData,
-      priority_skills: formData.priority_skills
-        .split(",")
-        .map((skill) => skill.trim())
-        .filter(Boolean),
-      secondary_skills: formData.secondary_skills
-        .split(",")
-        .map((skill) => skill.trim())
-        .filter(Boolean),
-      keywords: formData.keywords
-        .split(",")
-        .map((keyword) => keyword.trim())
-        .filter(Boolean),
-    });
+      await updateJobOrder(jobOrder.id, {
+        ...formData,
+        priority_skills: formData.priority_skills
+          .split(",")
+          .map((skill) => skill.trim())
+          .filter(Boolean),
+        secondary_skills: formData.secondary_skills
+          .split(",")
+          .map((skill) => skill.trim())
+          .filter(Boolean),
+        keywords: formData.keywords
+          .split(",")
+          .map((keyword) => keyword.trim())
+          .filter(Boolean),
+        replacement_priority: Boolean(formData.replacement_priority),
+      });
+
+      setOpen(false);
+      router.refresh();
+    } catch (error) {
+      console.error("Failed to update job order:", error);
+      alert(
+        error instanceof Error ? error.message : "Failed to update job order",
+      );
+    } finally {
+      setIsSaving(false);
+    }
   }
 
   return (
@@ -135,6 +148,41 @@ export default function EditJobOrderButton({
                 onChange={(value) => updateField("assigned_recruiter", value)}
                 options={["Michael Sullivan", "Hans Denton"]}
               />
+
+              <Input
+                label="Priority Skills"
+                value={formData.priority_skills}
+                onChange={(value) => updateField("priority_skills", value)}
+              />
+
+              <Input
+                label="Secondary Skills"
+                value={formData.secondary_skills}
+                onChange={(value) => updateField("secondary_skills", value)}
+              />
+
+              <Input
+                label="Keywords"
+                value={formData.keywords}
+                onChange={(value) => updateField("keywords", value)}
+              />
+
+              <Input
+                label="Preferred Location"
+                value={formData.preferred_location}
+                onChange={(value) => updateField("preferred_location", value)}
+              />
+
+              <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
+                <input
+                  type="checkbox"
+                  checked={Boolean(formData.replacement_priority)}
+                  onChange={(event) =>
+                    updateField("replacement_priority", event.target.checked)
+                  }
+                />
+                Replacement priority
+              </label>
 
               <div className="md:col-span-2">
                 <label className="mb-2 block text-sm font-medium text-slate-700">
