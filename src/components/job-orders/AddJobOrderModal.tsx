@@ -15,15 +15,18 @@ const initialFormData = {
   status: "Open",
   priority: "Medium",
   location: "",
+  zip_code: "",
   salary_range: "",
   assigned_recruiter: "Michael Sullivan",
+  assigned_recruiter_id: "",
+  exclusive_until: "",
+  assignment_locked: false,
   description: "",
   priority_skills: "",
   secondary_skills: "",
   keywords: "",
   preferred_location: "",
   replacement_priority: false,
-  zip_code: "",
 };
 
 export default function AddJobOrderModal({
@@ -143,6 +146,31 @@ export default function AddJobOrderModal({
             onChange={(value) => updateField("assigned_recruiter", value)}
             options={["Michael Sullivan", "Hans Denton"]}
           />
+
+          <Input
+            label="Recruiter ID"
+            placeholder="michael-sullivan"
+            value={formData.assigned_recruiter_id}
+            onChange={(value) => updateField("assigned_recruiter_id", value)}
+          />
+
+          <Input
+            label="Exclusive Until"
+            placeholder="2026-08-01"
+            value={formData.exclusive_until}
+            onChange={(value) => updateField("exclusive_until", value)}
+          />
+
+          <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
+            <input
+              type="checkbox"
+              checked={Boolean(formData.assignment_locked)}
+              onChange={(event) =>
+                updateField("assignment_locked", event.target.checked)
+              }
+            />
+            Assignment locked
+          </label>
 
           <Input
             label="Priority Skills"

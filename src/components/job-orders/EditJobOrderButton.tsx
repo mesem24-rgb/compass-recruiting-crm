@@ -31,6 +31,9 @@ export default function EditJobOrderButton({
     keywords: jobOrder.keywords?.join(", ") ?? "",
     preferred_location: jobOrder.preferred_location ?? "",
     replacement_priority: jobOrder.replacement_priority ?? false,
+    assigned_recruiter_id: jobOrder.assigned_recruiter_id ?? "",
+    exclusive_until: jobOrder.exclusive_until ?? "",
+    assignment_locked: jobOrder.assignment_locked ?? false,
   });
 
   function updateField(field: keyof typeof formData, value: string | boolean) {
@@ -155,6 +158,31 @@ export default function EditJobOrderButton({
                 onChange={(value) => updateField("assigned_recruiter", value)}
                 options={["Michael Sullivan", "Hans Denton"]}
               />
+
+              <Input
+                label="Recruiter ID"
+                value={formData.assigned_recruiter_id}
+                onChange={(value) =>
+                  updateField("assigned_recruiter_id", value)
+                }
+              />
+
+              <Input
+                label="Exclusive Until"
+                value={formData.exclusive_until}
+                onChange={(value) => updateField("exclusive_until", value)}
+              />
+
+              <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
+                <input
+                  type="checkbox"
+                  checked={Boolean(formData.assignment_locked)}
+                  onChange={(event) =>
+                    updateField("assignment_locked", event.target.checked)
+                  }
+                />
+                Assignment locked
+              </label>
 
               <Input
                 label="Priority Skills"

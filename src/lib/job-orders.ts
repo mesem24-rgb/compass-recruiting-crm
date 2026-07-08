@@ -20,6 +20,9 @@ export type JobOrder = {
   preferred_location: string | null;
   replacement_priority: boolean | null;
   zip_code: string | null;
+  assigned_recruiter_id: string | null;
+  exclusive_until: string | null;
+  assignment_locked: boolean | null;
 };
 
 /* SECTION: Job Order Queries */
@@ -70,6 +73,9 @@ export type CreateJobOrderInput = {
   preferred_location: string;
   replacement_priority: boolean;
   zip_code: string;
+  assigned_recruiter_id: string;
+  exclusive_until: string;
+  assignment_locked: boolean;
 };
 
 export async function createJobOrder(jobOrder: CreateJobOrderInput) {
