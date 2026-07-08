@@ -10,6 +10,7 @@ import { getRankedCandidateMatches } from "@/lib/matching";
 import SubmitCandidateButton from "@/components/submissions/SubmitCandidateButton";
 import PageSection from "@/components/ui/PageSection";
 import EmptyState from "@/components/ui/EmptyState";
+import { buildRecommendation } from "@/lib/recommendations";
 
 type JobOrderDetailPageProps = {
   params: Promise<{
@@ -70,11 +71,10 @@ export default async function JobOrderDetailPage({
         <section className="space-y-6 xl:col-span-2">
           {/* SECTION: Job Overview */}
 
-          <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h2 className="text-lg font-semibold text-slate-950">
-              Job Overview
-            </h2>
-
+          <PageSection
+            title="Job Overview"
+            description="Overview of the selected job order."
+          >
             <div className="mt-6 grid gap-4 md:grid-cols-2">
               <Info label="Client" value={job.client ?? "No client listed"} />
               <Info label="Status" value={job.status ?? "Open"} />
@@ -109,7 +109,7 @@ export default async function JobOrderDetailPage({
                 {job.description ?? "No description listed"}
               </p>
             </div>
-          </div>
+          </PageSection>
 
           {/* SECTION: Matching Candidates */}
 
@@ -117,104 +117,173 @@ export default async function JobOrderDetailPage({
             title="Matching Candidates"
             description="Ranked by skills, keywords, location, and relocation fit."
           >
-            <div className="mb-4">
-              <h2 className="text-lg font-semibold text-slate-950">
-                Matching Candidates
-              </h2>
-              <p className="text-sm text-slate-500">
-                Ranked by skills, keywords, location, and relocation fit.
-              </p>
-            </div>
-
             <div className="space-y-3">
               {matches.length > 0 ? (
-                matches.map((match) => (
-                  <div
-                    key={match.candidate.id}
-                    className="rounded-lg border border-slate-100 bg-slate-50 p-4"
-                  >
-                    <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-                      <div>
-                        <p className="font-medium text-slate-950">
-                          {match.candidate.name}
-                        </p>
-                        <p className="text-sm text-slate-500">
-                          {match.candidate.role ?? "No role listed"}
-                        </p>
-                      </div>
+                matches.map((match) => {
+                  const recommendations = buildRecommendation(match);
 
-                      <div className="text-left md:text-right">
-                        <p className="text-sm text-amber-500">
-                          <MatchStars score={match.score} />
-                        </p>
-                        <div className="mt-1 inline-flex rounded-full bg-slate-950 px-3 py-1 text-sm font-semibold text-white">
-                          {match.score}% Match
+                  return (
+                    <div
+                      key={match.candidate.id}
+                      className="rounded-lg border border-slate-100 bg-slate-50 p-4"
+                    >
+                      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                        <div>
+                          <p className="font-medium text-slate-950">
+                            {match.candidate.name}
+                          </p>
+                          <p className="text-sm text-slate-500">
+                            {match.candidate.role ?? "No role listed"}
+                          </p>
+                        </div>
+
+                        <div className="text-left md:text-right">
+                          <p className="text-lg tracking-wide text-amber-400">
+                            <MatchStars score={match.score} />
+                          </p>
+
+                          <p className="mt-2 text-2xl font-bold text-slate-950">
+                            <MatchLabel score={match.score} />
+                          </p>
+
+                          <p className="mt-1 text-sm font-semibold text-slate-500">
+                            {match.score}% Match
+                          </p>
+
+                          <MatchGauge score={match.score} />
                         </div>
                       </div>
-                    </div>
 
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      {match.matchedPrioritySkills.map((skill) => (
-                        <span
-                          key={`priority-${skill}`}
-                          className="rounded-full bg-emerald-50 px-2 py-1 text-xs font-medium text-emerald-700"
-                        >
-                          Priority: {skill}
-                        </span>
-                      ))}
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        {match.matchedPrioritySkills.map((skill) => (
+                          <span
+                            key={`priority-${skill}`}
+                            className="rounded-full bg-emerald-50 px-2 py-1 text-xs font-medium text-emerald-700"
+                          >
+                            Priority: {skill}
+                          </span>
+                        ))}
 
-                      {match.matchedSecondarySkills.map((skill) => (
-                        <span
-                          key={`secondary-${skill}`}
-                          className="rounded-full bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700"
-                        >
-                          Secondary: {skill}
-                        </span>
-                      ))}
+                        {match.matchedSecondarySkills.map((skill) => (
+                          <span
+                            key={`secondary-${skill}`}
+                            className="rounded-full bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700"
+                          >
+                            Secondary: {skill}
+                          </span>
+                        ))}
 
-                      {match.matchedKeywords.map((keyword) => (
-                        <span
-                          key={`keyword-${keyword}`}
-                          className="rounded-full bg-purple-50 px-2 py-1 text-xs font-medium text-purple-700"
-                        >
-                          Keyword: {keyword}
-                        </span>
-                      ))}
+                        {match.matchedKeywords.map((keyword) => (
+                          <span
+                            key={`keyword-${keyword}`}
+                            className="rounded-full bg-purple-50 px-2 py-1 text-xs font-medium text-purple-700"
+                          >
+                            Keyword: {keyword}
+                          </span>
+                        ))}
 
-                      {match.locationMatch && (
-                        <span className="rounded-full bg-slate-200 px-2 py-1 text-xs font-medium text-slate-700">
-                          Location Match
-                        </span>
-                      )}
-
-                      {match.relocationMatch && (
-                        <span className="rounded-full bg-amber-50 px-2 py-1 text-xs font-medium text-amber-700">
-                          Willing to Relocate
-                        </span>
-                      )}
-                    </div>
-
-                    {match.breakdown && (
-                      <MatchBreakdown breakdown={match.breakdown} />
-                    )}
-                    <div className="mt-4 flex flex-wrap gap-2">
-                      <Link
-                        href={`/candidates/${match.candidate.id}`}
-                        className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
-                      >
-                        View Profile
-                      </Link>
-
-                      <SubmitCandidateButton
-                        candidateId={match.candidate.id}
-                        jobOrderId={job.id}
-                        alreadySubmitted={submittedCandidateIds.has(
-                          match.candidate.id,
+                        {match.locationMatch && (
+                          <span className="rounded-full bg-slate-200 px-2 py-1 text-xs font-medium text-slate-700">
+                            Location Match
+                          </span>
                         )}
-                      />
+
+                        {match.relocationMatch && (
+                          <span className="rounded-full bg-amber-50 px-2 py-1 text-xs font-medium text-amber-700">
+                            Willing to Relocate
+                          </span>
+                        )}
+                      </div>
+
+                      {match.breakdown && (
+                        <MatchBreakdown breakdown={match.breakdown} />
+                      )}
+
+                     
+
+                      <div className="mt-4 rounded-xl border border-sky-200 bg-gradient-to-r from-sky-50 via-blue-50 to-indigo-50 p-4 shadow-sm">
+                        <div className="flex items-start gap-3">
+                          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-sky-100 text-xl">
+                            🤖
+                          </div>
+
+                          <div className="flex-1">
+                            <h3 className="font-semibold text-slate-900">
+                              Compass Match Analysis
+                            </h3>
+
+                            <p className="mt-1 text-xs text-slate-500">
+                              This recommendation is generated using skills,
+                              keywords, location, relocation preferences, and
+                              overall candidate fit.
+                            </p>
+                            <div className="mt-3">
+                              <MatchConfidence score={match.score} />
+                            </div>
+                          </div>
+                        </div>
+
+                        <ul className="mt-4 space-y-2">
+                          {recommendations.map((reason) => (
+                            <li
+                              key={reason}
+                              className="flex items-start gap-2 text-sm text-slate-700"
+                            >
+                              <span className="mt-0.5 text-emerald-600">✓</span>
+                              <span>{reason}</span>
+                            </li>
+                          ))}
+                        </ul>
+
+                        {(match.missingPrioritySkills.length > 0 ||
+                          match.missingSecondarySkills.length > 0) && (
+                          <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-3">
+                            <p className="mb-2 text-sm font-semibold text-slate-900">
+                              Needs Improvement
+                            </p>
+
+                            <div className="flex flex-wrap gap-2">
+                              {match.missingPrioritySkills.map((skill) => (
+                                <span
+                                  key={`missing-priority-${skill}`}
+                                  className="rounded-full bg-white px-2 py-1 text-xs font-medium text-amber-700"
+                                >
+                                  Missing Priority: {skill}
+                                </span>
+                              ))}
+
+                              {match.missingSecondarySkills.map((skill) => (
+                                <span
+                                  key={`missing-secondary-${skill}`}
+                                  className="rounded-full bg-white px-2 py-1 text-xs font-medium text-amber-700"
+                                >
+                                  Missing Secondary: {skill}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="mt-4 flex flex-wrap gap-2">
+                        <Link
+                          href={`/candidates/${match.candidate.id}`}
+                          className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
+                        >
+                          View Profile
+                        </Link>
+
+                        <SubmitCandidateButton
+                          candidateId={match.candidate.id}
+                          jobOrderId={job.id}
+                          alreadySubmitted={submittedCandidateIds.has(
+                            match.candidate.id,
+                          )}
+                        />
+                      </div>
                     </div>
-                  </div>
-                ))
+                  );
+                })
               ) : (
                 <EmptyState
                   title="No matching candidates found."
@@ -228,12 +297,8 @@ export default async function JobOrderDetailPage({
 
           <PageSection
             title="Submitted Candidates"
-            description="Ranked by skills, keywords, location, and relocation fit."
+            description="Candidates that have been submitted to this job."
           >
-            <h2 className="mb-4 text-lg font-semibold text-slate-950">
-              Submitted Candidates
-            </h2>
-
             <div className="space-y-3">
               {submissions.length > 0 ? (
                 submissions.map((submission) => {
@@ -275,10 +340,6 @@ export default async function JobOrderDetailPage({
             title="Job Activity"
             description="Recent updates and changes to this job order."
           >
-            <h2 className="mb-4 text-lg font-semibold text-slate-950">
-              Job Activity
-            </h2>
-
             <div className="space-y-4">
               <Activity
                 title="Job order created"
@@ -300,10 +361,8 @@ export default async function JobOrderDetailPage({
 
           <PageSection
             title="Job Status"
-            description="Ranked by skills, keywords, location, and relocation fit."
+            description="Current hiring status and recruiter assignment."
           >
-            <h2 className="text-lg font-semibold text-slate-950">Job Status</h2>
-
             <div className="mt-4 space-y-3 text-sm text-slate-600">
               <p>Status: {job.status ?? "Open"}</p>
               <p>Priority: {job.priority ?? "Medium"}</p>
@@ -315,12 +374,8 @@ export default async function JobOrderDetailPage({
 
           <PageSection
             title="Quick Metrics"
-            description="Ranked by skills, keywords, location, and relocation fit."
+            description="Real-time recruiting metrics for this job."
           >
-            <h2 className="text-lg font-semibold text-slate-950">
-              Quick Metrics
-            </h2>
-
             <div className="mt-4 grid gap-3">
               <Metric label="Submitted" value={String(submissions.length)} />
               <Metric label="Interviewing" value="0" />
@@ -379,6 +434,59 @@ function MatchStars({ score }: { score: number }) {
   return <span>★☆☆☆☆</span>;
 }
 
+function MatchConfidence({ score }: { score: number }) {
+  if (score >= 90) {
+    return (
+      <span className="inline-flex items-center rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">
+        🟢 High Confidence
+      </span>
+    );
+  }
+
+  if (score >= 75) {
+    return (
+      <span className="inline-flex items-center rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700">
+        🔵 Strong Match
+      </span>
+    );
+  }
+
+  if (score >= 60) {
+    return (
+      <span className="inline-flex items-center rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-700">
+        🟡 Potential Match
+      </span>
+    );
+  }
+
+  return (
+    <span className="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
+      ⚪ Low Match
+    </span>
+  );
+}
+
+function MatchGauge({ score }: { score: number }) {
+  return (
+    <div className="mt-2 w-32">
+      <div className="h-2 overflow-hidden rounded-full bg-slate-200">
+        <div
+          className={`h-full rounded-full ${
+            score >= 90
+              ? "bg-emerald-500"
+              : score >= 75
+                ? "bg-blue-500"
+                : score >= 60
+                  ? "bg-amber-400"
+                  : "bg-slate-400"
+          }`}
+          style={{ width: `${score}%` }}
+        />
+      </div>
+    </div>
+  );
+}
+
 function MatchBreakdown({
   breakdown,
 }: {
@@ -399,4 +507,11 @@ function MatchBreakdown({
       <p>Relocation: +{breakdown.relocation}</p>
     </div>
   );
+}
+
+function MatchLabel({ score }: { score: number }) {
+  if (score >= 90) return <span>Excellent Match</span>;
+  if (score >= 75) return <span>Strong Match</span>;
+  if (score >= 60) return <span>Potential Match</span>;
+  return <span>Low Match</span>;
 }

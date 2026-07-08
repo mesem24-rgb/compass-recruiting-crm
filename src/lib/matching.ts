@@ -11,6 +11,9 @@ export type CandidateMatch = {
   matchedSecondarySkills: string[];
   matchedKeywords: string[];
 
+  missingPrioritySkills: string[];
+  missingSecondarySkills: string[];
+
   locationMatch: boolean;
   relocationMatch: boolean;
 
@@ -81,6 +84,14 @@ export function scoreCandidateForJob(
   const relocationMatch =
     !locationMatch && candidate.willing_to_relocate === true;
 
+  const missingPrioritySkills = (job.priority_skills ?? []).filter(
+    (skill) => !matchedPrioritySkills.includes(skill),
+  );
+
+  const missingSecondarySkills = (job.secondary_skills ?? []).filter(
+    (skill) => !matchedSecondarySkills.includes(skill),
+  );
+
   const breakdown = {
     priority: matchedPrioritySkills.length * 25,
     secondary: matchedSecondarySkills.length * 12,
@@ -104,6 +115,8 @@ export function scoreCandidateForJob(
     matchedPrioritySkills,
     matchedSecondarySkills,
     matchedKeywords,
+    missingPrioritySkills,
+    missingSecondarySkills,
     locationMatch,
     relocationMatch,
     breakdown,
