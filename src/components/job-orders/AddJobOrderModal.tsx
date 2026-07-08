@@ -23,6 +23,7 @@ const initialFormData = {
   keywords: "",
   preferred_location: "",
   replacement_priority: false,
+  zip_code: "",
 };
 
 export default function AddJobOrderModal({
@@ -120,6 +121,13 @@ export default function AddJobOrderModal({
             placeholder="Dallas, TX"
             value={formData.location}
             onChange={(value) => updateField("location", value)}
+          />
+
+          <Input
+            label="ZIP Code"
+            placeholder="39503"
+            value={formData.zip_code}
+            onChange={(value) => updateField("zip_code", value)}
           />
 
           <Input

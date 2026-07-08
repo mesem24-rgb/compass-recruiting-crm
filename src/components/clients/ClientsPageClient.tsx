@@ -5,6 +5,7 @@ import Link from "next/link";
 import AddClientModal from "@/components/clients/AddClientModal";
 import PageHeader from "@/components/ui/PageHeader";
 import type { Client } from "@/lib/clients";
+import EmptyState from "../ui/EmptyState";
 
 type ClientsPageClientProps = {
   clients: Client[];
@@ -27,9 +28,10 @@ export default function ClientsPageClient({ clients }: ClientsPageClientProps) {
       {/* SECTION: Empty State */}
 
       {clients.length === 0 && (
-        <div className="rounded-xl border border-dashed border-slate-300 bg-white p-8 text-center text-sm text-slate-500">
-          No clients have been added yet. Click New Client to create one.
-        </div>
+        <EmptyState
+          title="No clients yet."
+          description="Create your first client to begin managing recruiting relationships."
+        />
       )}
 
       {/* SECTION: Client Cards */}

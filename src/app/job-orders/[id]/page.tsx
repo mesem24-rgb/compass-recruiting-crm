@@ -9,6 +9,7 @@ import { getSubmissionsForJobOrder } from "@/lib/submissions";
 import { getRankedCandidateMatches } from "@/lib/matching";
 import SubmitCandidateButton from "@/components/submissions/SubmitCandidateButton";
 import PageSection from "@/components/ui/PageSection";
+import EmptyState from "@/components/ui/EmptyState";
 
 type JobOrderDetailPageProps = {
   params: Promise<{
@@ -215,11 +216,10 @@ export default async function JobOrderDetailPage({
                   </div>
                 ))
               ) : (
-                <div className="rounded-lg border border-dashed border-slate-300 bg-slate-50 p-4 text-sm text-slate-500">
-                  No matching candidates found yet. Add priority skills or
-                  keywords to this job order and candidate profiles to generate
-                  matches.
-                </div>
+                <EmptyState
+                  title="No matching candidates found."
+                  description="Add priority skills, keywords, or preferred locations to this job order to generate recommendations."
+                />
               )}
             </div>
           </PageSection>
@@ -261,9 +261,10 @@ export default async function JobOrderDetailPage({
                   );
                 })
               ) : (
-                <div className="rounded-lg border border-dashed border-slate-300 bg-slate-50 p-4 text-sm text-slate-500">
-                  No candidates have been submitted to this job yet.
-                </div>
+                <EmptyState
+                  title="No candidates have been submitted yet."
+                  description="Submit candidates from the Matching Candidates section to begin tracking the recruiting process."
+                />
               )}
             </div>
           </PageSection>

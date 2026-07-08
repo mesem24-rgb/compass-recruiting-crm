@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import StatusBadge from "@/components/ui/StatusBadge";
 import type { Candidate } from "@/lib/candidates";
+import EmptyState from "../ui/EmptyState";
 
 type CandidateTableProps = {
   candidates: Candidate[];
@@ -16,6 +17,7 @@ export default function CandidateTable({ candidates }: CandidateTableProps) {
   const [skillSearch, setSkillSearch] = useState("");
   const [locationSearch, setLocationSearch] = useState("");
   const [relocationOnly, setRelocationOnly] = useState(false);
+  const [zipSearch, setZipSearch] = useState("");
 
   const filteredCandidates = useMemo(() => {
     return candidates.filter((candidate) => {
@@ -26,6 +28,8 @@ export default function CandidateTable({ candidates }: CandidateTableProps) {
       const prioritySkills = candidate.priority_skills ?? [];
       const secondarySkills = candidate.secondary_skills ?? [];
       const keywords = candidate.keywords ?? [];
+      const matchesZip =
+        !zipSearch || candidate.zip_code?.startsWith(zipSearch);
 
       const matchesSkills =
         !skillSearch ||
@@ -63,6 +67,7 @@ export default function CandidateTable({ candidates }: CandidateTableProps) {
         matchesRecruiter &&
         matchesSkills &&
         matchesLocation &&
+        matchesZip &&
         matchesRelocation
       );
     });
@@ -73,6 +78,7 @@ export default function CandidateTable({ candidates }: CandidateTableProps) {
     recruiter,
     skillSearch,
     locationSearch,
+    zipSearch,
     relocationOnly,
   ]);
 
@@ -99,6 +105,12 @@ export default function CandidateTable({ candidates }: CandidateTableProps) {
           value={locationSearch}
           onChange={(event) => setLocationSearch(event.target.value)}
           placeholder="Search location..."
+          className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 placeholder:text-slate-500 outline-none focus:border-slate-400"
+        />
+        <input
+          value={zipSearch}
+          onChange={(event) => setZipSearch(event.target.value)}
+          placeholder="Search ZIP code..."
           className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 placeholder:text-slate-500 outline-none focus:border-slate-400"
         />
         <label className="flex min-w-[200px] items-center gap-2 rounded-lg border border-slate-200 px-4 py-2 text-sm text-slate-700">
@@ -234,9 +246,10 @@ export default function CandidateTable({ candidates }: CandidateTableProps) {
       {/* SECTION: Empty State */}
 
       {filteredCandidates.length === 0 && (
-        <div className="rounded-xl border border-slate-200 bg-white p-6 text-center text-sm text-slate-500">
-          No candidates match your current filters.
-        </div>
+        <EmptyState
+          title="No candidates found."
+          description="Try adjusting your search filters or create a new candidate."
+        />
       )}
     </>
   );

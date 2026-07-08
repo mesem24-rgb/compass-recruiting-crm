@@ -25,6 +25,7 @@ type CandidateFormData = {
   keywords: string;
   preferred_location: string;
   willing_to_relocate: boolean;
+  zip_code: string;
 };
 
 const initialFormData: CandidateFormData = {
@@ -44,6 +45,7 @@ const initialFormData: CandidateFormData = {
   keywords: "",
   preferred_location: "",
   willing_to_relocate: false,
+  zip_code: "",
 };
 
 export default function AddCandidateModal({
@@ -56,7 +58,10 @@ export default function AddCandidateModal({
 
   if (!open) return null;
 
-  function updateField(field: keyof CandidateFormData, value: string | boolean) {
+  function updateField(
+    field: keyof CandidateFormData,
+    value: string | boolean,
+  ) {
     setFormData((current) => ({
       ...current,
       [field]: value,
@@ -84,6 +89,7 @@ export default function AddCandidateModal({
       recruiter: formData.recruiter,
       status: formData.status,
       experience: formData.experience,
+      zip_code: formData.zip_code,
       priority_skills: formData.priority_skills
         .split(",")
         .map((skill) => skill.trim())
@@ -175,6 +181,13 @@ export default function AddCandidateModal({
             placeholder="Dallas, TX"
             value={formData.location}
             onChange={(value) => updateField("location", value)}
+          />
+
+          <Input
+            label="ZIP Code"
+            placeholder="39503"
+            value={formData.zip_code}
+            onChange={(value) => updateField("zip_code", value)}
           />
 
           <Input

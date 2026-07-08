@@ -8,6 +8,7 @@ import AddCandidateNote from "@/components/candidates/AddCandidateNote";
 import { getCandidateById, getCandidateNotes } from "@/lib/candidates";
 import DeleteCandidateNoteButton from "@/components/candidates/DeleteCandidateNoteButton";
 import { getSubmissionsForCandidate } from "@/lib/submissions";
+import ActionBar from "@/components/ui/ActionBar";
 
 type CandidateDetailPageProps = {
   params: Promise<{
@@ -54,28 +55,23 @@ export default async function CandidateDetailPage({
 
       {/* SECTION: Candidate Actions */}
 
-      <div className="mt-6 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-        <h2 className="mb-4 text-lg font-semibold text-slate-950">
-          Candidate Actions
-        </h2>
+      <ActionBar title="Candidate Actions">
+        <EditCandidateButton candidate={candidate} />
 
-        <div className="flex flex-wrap gap-3">
-          <EditCandidateButton candidate={candidate} />
+        <button className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
+          Schedule Interview
+        </button>
 
-          <button className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
-            Schedule Interview
-          </button>
+        <button className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
+          Submit to Client
+        </button>
 
-          <button className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
-            Submit to Client
-          </button>
+        <button className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
+          Add Note
+        </button>
 
-          <button className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
-            Add Note
-          </button>
-          <DeleteCandidateButton candidateId={candidate.id} />
-        </div>
-      </div>
+        <DeleteCandidateButton candidateId={candidate.id} />
+      </ActionBar>
 
       <div className="mt-6 grid gap-6 xl:grid-cols-3">
         <section className="space-y-6 xl:col-span-2">

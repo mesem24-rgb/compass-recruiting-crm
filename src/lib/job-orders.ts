@@ -19,6 +19,7 @@ export type JobOrder = {
   keywords: string[] | null;
   preferred_location: string | null;
   replacement_priority: boolean | null;
+  zip_code: string | null;
 };
 
 /* SECTION: Job Order Queries */
@@ -68,6 +69,7 @@ export type CreateJobOrderInput = {
   keywords: string[];
   preferred_location: string;
   replacement_priority: boolean;
+  zip_code: string;
 };
 
 export async function createJobOrder(jobOrder: CreateJobOrderInput) {

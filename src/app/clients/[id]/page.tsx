@@ -6,6 +6,7 @@ import { getClientById } from "@/lib/clients";
 import { jobOrders } from "@/lib/data";
 import DeleteClientButton from "@/components/clients/DeleteClientButton";
 import EditClientButton from "@/components/clients/EditClientButton";
+import ActionBar from "@/components/ui/ActionBar";
 
 type ClientDetailPageProps = {
   params: Promise<{
@@ -57,28 +58,23 @@ export default async function ClientDetailPage({
 
       {/* SECTION: Client Actions */}
 
-      <div className="mt-6 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-        <h2 className="mb-4 text-lg font-semibold text-slate-950">
-          Client Actions
-        </h2>
+      <ActionBar title="Client Actions">
+        <EditClientButton client={client} />
 
-        <div className="flex flex-wrap gap-3">
-          <EditClientButton client={client} />
+        <button className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
+          Add Job Order
+        </button>
 
-          <button className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
-            Add Job Order
-          </button>
+        <button className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
+          Add Contact
+        </button>
 
-          <button className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
-            Add Contact
-          </button>
+        <button className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
+          Add Note
+        </button>
 
-          <button className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
-            Add Note
-          </button>
-          <DeleteClientButton clientId={client.id} />
-        </div>
-      </div>
+        <DeleteClientButton clientId={client.id} />
+      </ActionBar>
 
       <div className="mt-6 grid gap-6 xl:grid-cols-3">
         <section className="space-y-6 xl:col-span-2">
@@ -192,7 +188,10 @@ export default async function ClientDetailPage({
 
             <div className="mt-4 grid gap-3">
               <Metric label="Open Jobs" value={String(client.open_jobs ?? 0)} />
-              <Metric label="Placements" value={String(client.placements ?? 0)} />
+              <Metric
+                label="Placements"
+                value={String(client.placements ?? 0)}
+              />
               <Metric label="Revenue" value={client.revenue ?? "$0"} />
             </div>
           </div>

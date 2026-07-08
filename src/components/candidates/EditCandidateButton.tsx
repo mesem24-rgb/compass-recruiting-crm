@@ -22,6 +22,7 @@ export default function EditCandidateButton({
     email: candidate.email ?? "",
     phone: candidate.phone ?? "",
     location: candidate.location ?? "",
+    zip_code: candidate.zip_code ?? "",
     status: candidate.status ?? "Qualified",
     source: candidate.source ?? "LinkedIn",
     recruiter: candidate.recruiter ?? "Michael Sullivan",
@@ -133,6 +134,12 @@ export default function EditCandidateButton({
                 label="Location"
                 value={formData.location}
                 onChange={(value) => updateField("location", value)}
+              />
+
+              <Input
+                label="ZIP Code"
+                value={formData.zip_code}
+                onChange={(value) => updateField("zip_code", value)}
               />
 
               <Input

@@ -6,6 +6,7 @@ import AddJobOrderModal from "@/components/job-orders/AddJobOrderModal";
 import PageHeader from "@/components/ui/PageHeader";
 import StatusBadge from "@/components/ui/StatusBadge";
 import type { JobOrder } from "@/lib/job-orders";
+import EmptyState from "../ui/EmptyState";
 
 type JobOrdersPageClientProps = {
   jobOrders: JobOrder[];
@@ -30,9 +31,10 @@ export default function JobOrdersPageClient({
       {/* SECTION: Empty State */}
 
       {jobOrders.length === 0 && (
-        <div className="rounded-xl border border-dashed border-slate-300 bg-white p-8 text-center text-sm text-slate-500">
-          No job orders have been added yet.
-        </div>
+        <EmptyState
+          title="No job orders."
+          description="Create a job order to begin recruiting candidates."
+        />
       )}
 
       {/* SECTION: Job Orders Table */}
@@ -89,10 +91,7 @@ export default function JobOrdersPageClient({
 
       {/* SECTION: Add Job Order Modal */}
 
-      <AddJobOrderModal
-        open={modalOpen}
-        onClose={() => setModalOpen(false)}
-      />
+      <AddJobOrderModal open={modalOpen} onClose={() => setModalOpen(false)} />
     </>
   );
 }

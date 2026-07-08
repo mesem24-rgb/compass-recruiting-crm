@@ -20,6 +20,7 @@ export type Candidate = {
   keywords: string[] | null;
   preferred_location: string | null;
   willing_to_relocate: boolean | null;
+  zip_code: string | null;
 };
 
 /* SECTION: Candidate Queries */
@@ -71,6 +72,7 @@ export type UpdateCandidateInput = {
   email: string;
   phone: string;
   location: string;
+  zip_code: string;
   status: string;
   source: string;
   recruiter: string;

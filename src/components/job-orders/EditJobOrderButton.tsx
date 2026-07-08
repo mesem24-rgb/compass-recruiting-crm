@@ -22,6 +22,7 @@ export default function EditJobOrderButton({
     status: jobOrder.status ?? "Open",
     priority: jobOrder.priority ?? "Medium",
     location: jobOrder.location ?? "",
+    zip_code: jobOrder.zip_code ?? "",
     salary_range: jobOrder.salary_range ?? "",
     assigned_recruiter: jobOrder.assigned_recruiter ?? "Michael Sullivan",
     description: jobOrder.description ?? "",
@@ -134,6 +135,12 @@ export default function EditJobOrderButton({
                 label="Location"
                 value={formData.location}
                 onChange={(value) => updateField("location", value)}
+              />
+
+              <Input
+                label="ZIP Code"
+                value={formData.zip_code}
+                onChange={(value) => updateField("zip_code", value)}
               />
 
               <Input
