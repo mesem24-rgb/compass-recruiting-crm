@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { createJobOrder } from "@/lib/job-orders";
+import { getRecruiterId, recruiters } from "@/lib/recruiters";
 
 type AddJobOrderModalProps = {
   open: boolean;
@@ -18,7 +19,7 @@ const initialFormData = {
   zip_code: "",
   salary_range: "",
   assigned_recruiter: "Michael Sullivan",
-  assigned_recruiter_id: "michael-sullivan",
+  assigned_recruiter_id: getRecruiterId("Michael Sullivan"),
   exclusive_until: "",
   assignment_locked: true,
   description: "",
@@ -54,7 +55,7 @@ export default function AddJobOrderModal({
 
       await createJobOrder({
         ...formData,
-        assigned_recruiter_id: "michael-sullivan",
+        assigned_recruiter_id: getRecruiterId(formData.assigned_recruiter),
         exclusive_until: exclusiveUntil.toISOString().split("T")[0],
         assignment_locked: true,
         priority_skills: formData.priority_skills
@@ -164,7 +165,7 @@ export default function AddJobOrderModal({
             label="Assigned Recruiter"
             value={formData.assigned_recruiter}
             onChange={(value) => updateField("assigned_recruiter", value)}
-            options={["Michael Sullivan", "Hans Denton"]}
+            options={recruiters.map((recruiter) => recruiter.name)}
           />
 
           <Input

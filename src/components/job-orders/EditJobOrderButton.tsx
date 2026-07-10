@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { JobOrder } from "@/lib/job-orders";
 import { updateJobOrder } from "@/lib/job-orders";
+import { getRecruiterId, recruiters } from "@/lib/recruiters";
 
 type EditJobOrderButtonProps = {
   jobOrder: JobOrder;
@@ -16,6 +17,8 @@ export default function EditJobOrderButton({
   const [open, setOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
+  const initialAssignedRecruiter = jobOrder.assigned_recruiter ?? "Michael Sullivan";
+
   const [formData, setFormData] = useState({
     title: jobOrder.title ?? "",
     client: jobOrder.client ?? "",
@@ -24,14 +27,14 @@ export default function EditJobOrderButton({
     location: jobOrder.location ?? "",
     zip_code: jobOrder.zip_code ?? "",
     salary_range: jobOrder.salary_range ?? "",
-    assigned_recruiter: jobOrder.assigned_recruiter ?? "Michael Sullivan",
+    assigned_recruiter: initialAssignedRecruiter,
     description: jobOrder.description ?? "",
     priority_skills: jobOrder.priority_skills?.join(", ") ?? "",
     secondary_skills: jobOrder.secondary_skills?.join(", ") ?? "",
     keywords: jobOrder.keywords?.join(", ") ?? "",
     preferred_location: jobOrder.preferred_location ?? "",
     replacement_priority: jobOrder.replacement_priority ?? false,
-    assigned_recruiter_id: jobOrder.assigned_recruiter_id ?? "",
+    assigned_recruiter_id: getRecruiterId(initialAssignedRecruiter),
     exclusive_until: jobOrder.exclusive_until ?? "",
     assignment_locked: jobOrder.assignment_locked ?? false,
   });
@@ -156,7 +159,7 @@ export default function EditJobOrderButton({
                 label="Assigned Recruiter"
                 value={formData.assigned_recruiter}
                 onChange={(value) => updateField("assigned_recruiter", value)}
-                options={["Michael Sullivan", "Hans Denton"]}
+                options={recruiters.map((recruiter) => recruiter.name)}
               />
 
               <Input
