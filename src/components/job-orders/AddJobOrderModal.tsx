@@ -18,9 +18,9 @@ const initialFormData = {
   zip_code: "",
   salary_range: "",
   assigned_recruiter: "Michael Sullivan",
-  assigned_recruiter_id: "",
+  assigned_recruiter_id: "michael-sullivan",
   exclusive_until: "",
-  assignment_locked: false,
+  assignment_locked: true,
   description: "",
   priority_skills: "",
   secondary_skills: "",
@@ -46,23 +46,43 @@ export default function AddJobOrderModal({
   async function handleSave() {
     if (!formData.title.trim()) return;
 
-    setIsSaving(true);
+    try {
+      setIsSaving(true);
 
-    await createJobOrder({
-      ...formData,
-      priority_skills: formData.priority_skills
-        .split(",")
-        .map((skill) => skill.trim())
-        .filter(Boolean),
-      secondary_skills: formData.secondary_skills
-        .split(",")
-        .map((skill) => skill.trim())
-        .filter(Boolean),
-      keywords: formData.keywords
-        .split(",")
-        .map((keyword) => keyword.trim())
-        .filter(Boolean),
-    });
+      const exclusiveUntil = new Date();
+      exclusiveUntil.setDate(exclusiveUntil.getDate() + 30);
+
+      await createJobOrder({
+        ...formData,
+        assigned_recruiter_id: "michael-sullivan",
+        exclusive_until: exclusiveUntil.toISOString().split("T")[0],
+        assignment_locked: true,
+        priority_skills: formData.priority_skills
+          .split(",")
+          .map((skill) => skill.trim())
+          .filter(Boolean),
+        secondary_skills: formData.secondary_skills
+          .split(",")
+          .map((skill) => skill.trim())
+          .filter(Boolean),
+        keywords: formData.keywords
+          .split(",")
+          .map((keyword) => keyword.trim())
+          .filter(Boolean),
+      });
+
+      setFormData(initialFormData);
+      onClose();
+      router.refresh();
+    } catch (error) {
+      console.error("Failed to create job order:", error);
+
+      alert(
+        error instanceof Error ? error.message : "Failed to create job order",
+      );
+    } finally {
+      setIsSaving(false);
+    }
   }
 
   return (
@@ -146,31 +166,6 @@ export default function AddJobOrderModal({
             onChange={(value) => updateField("assigned_recruiter", value)}
             options={["Michael Sullivan", "Hans Denton"]}
           />
-
-          <Input
-            label="Recruiter ID"
-            placeholder="michael-sullivan"
-            value={formData.assigned_recruiter_id}
-            onChange={(value) => updateField("assigned_recruiter_id", value)}
-          />
-
-          <Input
-            label="Exclusive Until"
-            placeholder="2026-08-01"
-            value={formData.exclusive_until}
-            onChange={(value) => updateField("exclusive_until", value)}
-          />
-
-          <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
-            <input
-              type="checkbox"
-              checked={Boolean(formData.assignment_locked)}
-              onChange={(event) =>
-                updateField("assignment_locked", event.target.checked)
-              }
-            />
-            Assignment locked
-          </label>
 
           <Input
             label="Priority Skills"
