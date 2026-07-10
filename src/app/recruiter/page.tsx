@@ -7,6 +7,7 @@ import StatusBadge from "@/components/ui/StatusBadge";
 import { getCandidates } from "@/lib/candidates";
 import { getJobOrders } from "@/lib/job-orders";
 import { getSubmissionsForJobOrder } from "@/lib/submissions";
+import { getAssignmentLockStatus } from "@/lib/job-orders";
 
 const currentRecruiter = "Michael Sullivan";
 const currentRecruiterId = "michael-sullivan";
@@ -32,16 +33,14 @@ export default async function RecruiterWorkspacePage() {
   );
 
   const jobsNearExpiration = lockedJobs.filter((job) => {
-    if (!job.exclusive_until) return false;
+  const lockStatus = getAssignmentLockStatus(job);
 
-    const today = new Date();
-    const expirationDate = new Date(job.exclusive_until);
-    const daysRemaining = Math.ceil(
-      (expirationDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
-    );
-
-    return daysRemaining <= 7 && daysRemaining >= 0;
-  });
+  return (
+    lockStatus.isLocked &&
+    lockStatus.daysRemaining !== null &&
+    lockStatus.daysRemaining <= 7
+  );
+});
 
   const myCandidates = candidates.filter(
     (candidate) => candidate.recruiter === currentRecruiter,

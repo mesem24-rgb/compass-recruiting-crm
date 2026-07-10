@@ -11,6 +11,7 @@ import SubmitCandidateButton from "@/components/submissions/SubmitCandidateButto
 import PageSection from "@/components/ui/PageSection";
 import EmptyState from "@/components/ui/EmptyState";
 import { buildRecommendation } from "@/lib/recommendations";
+import { getAssignmentLockStatus } from "@/lib/job-orders";
 
 type JobOrderDetailPageProps = {
   params: Promise<{
@@ -28,6 +29,8 @@ export default async function JobOrderDetailPage({
   if (!job) {
     notFound();
   }
+
+  const lockStatus = getAssignmentLockStatus(job);
 
   const [liveCandidates, submissions] = await Promise.all([
     getCandidates(),
@@ -199,8 +202,6 @@ export default async function JobOrderDetailPage({
                         <MatchBreakdown breakdown={match.breakdown} />
                       )}
 
-                     
-
                       <div className="mt-4 rounded-xl border border-sky-200 bg-gradient-to-r from-sky-50 via-blue-50 to-indigo-50 p-4 shadow-sm">
                         <div className="flex items-start gap-3">
                           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-sky-100 text-xl">
@@ -363,10 +364,52 @@ export default async function JobOrderDetailPage({
             title="Job Status"
             description="Current hiring status and recruiter assignment."
           >
-            <div className="mt-4 space-y-3 text-sm text-slate-600">
-              <p>Status: {job.status ?? "Open"}</p>
-              <p>Priority: {job.priority ?? "Medium"}</p>
-              <p>Recruiter: {job.assigned_recruiter ?? "Unassigned"}</p>
+            <div className="mt-4 grid gap-3">
+              <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+                <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
+                  Status
+                </p>
+
+                <p className="mt-1 font-medium text-slate-900">
+                  {job.status ?? "Open"}
+                </p>
+              </div>
+
+              <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+                <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
+                  Priority
+                </p>
+
+                <p className="mt-1 font-medium text-slate-900">
+                  {job.priority ?? "Medium"}
+                </p>
+              </div>
+
+              <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+                <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
+                  Assigned Recruiter
+                </p>
+
+                <p className="mt-1 font-medium text-slate-900">
+                  {job.assigned_recruiter ?? "Unassigned"}
+                </p>
+              </div>
+
+              <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+                <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
+                  Recruiter Assignment
+                </p>
+
+                <p className="mt-1 text-sm font-medium text-slate-900">
+                  {lockStatus.label}
+                </p>
+
+                {lockStatus.isLocked && job.assigned_recruiter && (
+                  <p className="mt-1 text-xs text-slate-500">
+                    Exclusive to {job.assigned_recruiter}
+                  </p>
+                )}
+              </div>
             </div>
           </PageSection>
 

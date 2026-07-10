@@ -111,3 +111,48 @@ export async function deleteJobOrder(id: string) {
     throw new Error(error.message);
   }
 }
+
+/* SECTION: Recruiter Assignment Lock Status */
+
+export function getAssignmentLockStatus(job: JobOrder) {
+  if (!job.assignment_locked || !job.exclusive_until) {
+    return {
+      isLocked: false,
+      isExpired: false,
+      daysRemaining: null,
+      label: "Open to all recruiters",
+    };
+  }
+
+  const today = new Date();
+  const expirationDate = new Date(job.exclusive_until);
+
+  const daysRemaining = Math.ceil(
+    (expirationDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
+  );
+
+  if (daysRemaining < 0) {
+    return {
+      isLocked: false,
+      isExpired: true,
+      daysRemaining,
+      label: "Open to all recruiters",
+    };
+  }
+
+  if (daysRemaining === 0) {
+    return {
+      isLocked: true,
+      isExpired: false,
+      daysRemaining,
+      label: "Exclusivity expires today",
+    };
+  }
+
+  return {
+    isLocked: true,
+    isExpired: false,
+    daysRemaining,
+    label: `${daysRemaining} day${daysRemaining === 1 ? "" : "s"} remaining`,
+  };
+}
