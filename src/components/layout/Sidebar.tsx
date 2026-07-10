@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { UserCheck } from "lucide-react";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
@@ -16,6 +17,7 @@ import {
 
 const navItems = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { label: "Recruiter", href: "/recruiter", icon: UserCheck },
   { label: "Candidates", href: "/candidates", icon: Users },
   { label: "Clients", href: "/clients", icon: Building2 },
   { label: "Job Orders", href: "/job-orders", icon: BriefcaseBusiness },
