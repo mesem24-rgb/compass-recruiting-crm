@@ -347,11 +347,67 @@ function JobCard({
       </div>
 
       {job.exclusive_until && (
-        <p className="mt-3 text-xs text-slate-500">
-          Exclusive Until: {new Date(job.exclusive_until).toLocaleDateString()}
-        </p>
-      )}
+  <LockCountdown
+    exclusiveUntil={job.exclusive_until}
+    assignmentLocked={job.assignment_locked ?? false}
+  />
+)}
     </Link>
+  );
+}
+
+/* SECTION: Lock Countdown */
+
+function LockCountdown({
+  exclusiveUntil,
+  assignmentLocked,
+}: {
+  exclusiveUntil: string;
+  assignmentLocked: boolean;
+}) {
+  const today = new Date();
+  const expirationDate = new Date(exclusiveUntil);
+
+  const daysRemaining = Math.ceil(
+    (expirationDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
+  );
+
+  if (!assignmentLocked || daysRemaining < 0) {
+    return (
+      <div className="mt-3 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-medium text-emerald-700">
+        Open to all recruiters
+      </div>
+    );
+  }
+
+  if (daysRemaining === 0) {
+    return (
+      <div className="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-medium text-red-700">
+        Exclusivity expires today
+      </div>
+    );
+  }
+
+  const tone =
+    daysRemaining <= 3
+      ? "border-red-200 bg-red-50 text-red-700"
+      : daysRemaining <= 7
+        ? "border-amber-200 bg-amber-50 text-amber-700"
+        : "border-slate-200 bg-white text-slate-600";
+
+  return (
+    <div className={`mt-3 rounded-lg border px-3 py-2 text-xs ${tone}`}>
+      <div className="flex items-center justify-between gap-3">
+        <span>
+          Exclusive until{" "}
+          {expirationDate.toLocaleDateString()}
+        </span>
+
+        <span className="font-semibold">
+          {daysRemaining} day{daysRemaining === 1 ? "" : "s"} remaining
+        </span>
+      </div>
+    </div>
   );
 }
 
