@@ -5,9 +5,10 @@ import PageSection from "@/components/ui/PageSection";
 import EmptyState from "@/components/ui/EmptyState";
 import StatusBadge from "@/components/ui/StatusBadge";
 import { getCandidates } from "@/lib/candidates";
-import { getJobOrders } from "@/lib/job-orders";
+import { getJobOrders, getAssignmentLockStatus } from "@/lib/job-orders";
 import { getSubmissionsForJobOrder } from "@/lib/submissions";
-import { getAssignmentLockStatus } from "@/lib/job-orders";
+import NotificationList from "@/components/recruiter/NotificationList";
+import { buildRecruiterNotifications } from "@/lib/notifications";
 
 const currentRecruiter = "Michael Sullivan";
 const currentRecruiterId = "michael-sullivan";
@@ -24,6 +25,8 @@ export default async function RecruiterWorkspacePage() {
       job.assigned_recruiter_id === currentRecruiterId,
   );
 
+  
+
   const replacementJobs = assignedJobs.filter(
     (job) => job.replacement_priority === true,
   );
@@ -33,14 +36,14 @@ export default async function RecruiterWorkspacePage() {
   );
 
   const jobsNearExpiration = lockedJobs.filter((job) => {
-  const lockStatus = getAssignmentLockStatus(job);
+    const lockStatus = getAssignmentLockStatus(job);
 
-  return (
-    lockStatus.isLocked &&
-    lockStatus.daysRemaining !== null &&
-    lockStatus.daysRemaining <= 7
-  );
-});
+    return (
+      lockStatus.isLocked &&
+      lockStatus.daysRemaining !== null &&
+      lockStatus.daysRemaining <= 7
+    );
+  });
 
   const myCandidates = candidates.filter(
     (candidate) => candidate.recruiter === currentRecruiter,
@@ -53,6 +56,11 @@ export default async function RecruiterWorkspacePage() {
   const placements = myCandidates.filter(
     (candidate) => candidate.status === "Placed",
   ).length;
+
+  const notifications = buildRecruiterNotifications({
+  candidates,
+  jobOrders,
+});
 
   const submissionGroups = await Promise.all(
     assignedJobs.map(async (job) => ({
@@ -149,13 +157,22 @@ export default async function RecruiterWorkspacePage() {
           </div>
         </PageSection>
 
+        {/* SECTION: Notifications */}
+
+        <PageSection
+          title="Notifications"
+          description="Recent recruiting activity and assignment alerts."
+        >
+          <NotificationList notifications={notifications} />
+        </PageSection>
+
         {/* SECTION: My Day */}
 
         <PageSection
           title="My Day"
           description="Priority actions based on your current recruiting workload."
         >
-          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+          <div className="grid gap-3 sm:grid-cols-2">
             <TaskCard
               label="Replacement Jobs"
               value={replacementJobs.length}
@@ -346,11 +363,11 @@ function JobCard({
       </div>
 
       {job.exclusive_until && (
-  <LockCountdown
-    exclusiveUntil={job.exclusive_until}
-    assignmentLocked={job.assignment_locked ?? false}
-  />
-)}
+        <LockCountdown
+          exclusiveUntil={job.exclusive_until}
+          assignmentLocked={job.assignment_locked ?? false}
+        />
+      )}
     </Link>
   );
 }
@@ -397,10 +414,7 @@ function LockCountdown({
   return (
     <div className={`mt-3 rounded-lg border px-3 py-2 text-xs ${tone}`}>
       <div className="flex items-center justify-between gap-3">
-        <span>
-          Exclusive until{" "}
-          {expirationDate.toLocaleDateString()}
-        </span>
+        <span>Exclusive until {expirationDate.toLocaleDateString()}</span>
 
         <span className="font-semibold">
           {daysRemaining} day{daysRemaining === 1 ? "" : "s"} remaining

@@ -5,6 +5,7 @@ import StatusBadge from "@/components/ui/StatusBadge";
 import { getCandidates } from "@/lib/candidates";
 import { getClients } from "@/lib/clients";
 import { getJobOrders } from "@/lib/job-orders";
+import DashboardHeader from "@/components/dashboard/DashboardHeader";
 
 export default async function DashboardPage() {
   const [candidates, clients, jobOrders] = await Promise.all([
@@ -65,12 +66,7 @@ export default async function DashboardPage() {
     <AppShell>
       {/* SECTION: Dashboard Header */}
 
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-slate-950">Dashboard</h1>
-        <p className="text-slate-500">
-          Live overview of candidates, clients, jobs, interviews, and placements.
-        </p>
-      </div>
+      <DashboardHeader />
 
       {/* SECTION: Quick Actions */}
 

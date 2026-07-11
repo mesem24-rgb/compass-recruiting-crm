@@ -1,10 +1,17 @@
 "use client";
 
 import MobileNav from "./MobileNav";
-import { useModals } from "@/components/providers/ModalProvider";
+import NotificationBell from "@/components/layout/NotificationBell";
+import type { Notification } from "@/lib/notifications";
 
-export default function Topbar() {
-  const { openCandidateModal } = useModals();
+type TopbarProps = {
+  notifications: Notification[];
+};
+
+export default function Topbar({
+  notifications,
+}: TopbarProps): React.ReactElement {
+  
 
   return (
     <header className="relative z-50 flex h-16 items-center justify-between border-b border-slate-200 bg-white px-4 md:px-6">
@@ -21,12 +28,12 @@ export default function Topbar() {
         </div>
       </div>
 
-      <button
-        onClick={openCandidateModal}
-        className="hidden rounded-lg bg-slate-950 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 sm:block"
-      >
-        Add Candidate
-      </button>
+      
+      <div className="flex items-center gap-3">
+        <NotificationBell notifications={notifications} />
+
+        {/* existing profile/menu controls */}
+      </div>
     </header>
   );
 }

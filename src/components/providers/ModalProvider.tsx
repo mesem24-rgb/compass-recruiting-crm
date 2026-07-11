@@ -9,7 +9,11 @@ type ModalContextType = {
 
 const ModalContext = createContext<ModalContextType | null>(null);
 
-export function ModalProvider({ children }: { children: React.ReactNode }) {
+export default function ModalProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const [candidateOpen, setCandidateOpen] = useState(false);
 
   return (

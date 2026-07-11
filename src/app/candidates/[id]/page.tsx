@@ -9,6 +9,8 @@ import { getCandidateById, getCandidateNotes } from "@/lib/candidates";
 import DeleteCandidateNoteButton from "@/components/candidates/DeleteCandidateNoteButton";
 import { getSubmissionsForCandidate } from "@/lib/submissions";
 import ActionBar from "@/components/ui/ActionBar";
+import ResumeUploadButton from "@/components/candidates/ResumeUploadButton";
+import ViewResumeButton from "@/components/candidates/ViewResumeButton";
 
 type CandidateDetailPageProps = {
   params: Promise<{
@@ -58,20 +60,27 @@ export default async function CandidateDetailPage({
       <ActionBar title="Candidate Actions">
         <EditCandidateButton candidate={candidate} />
 
-        <button className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
-          Schedule Interview
-        </button>
+        <ResumeUploadButton
+          candidateId={candidate.id}
+          currentFilename={candidate.resume_filename}
+        />
 
-        <button className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
-          Submit to Client
-        </button>
-
-        <button className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
-          Add Note
-        </button>
+        <ViewResumeButton resumePath={candidate.resume_path} />
 
         <DeleteCandidateButton candidateId={candidate.id} />
       </ActionBar>
+
+      <button className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
+        Schedule Interview
+      </button>
+
+      <button className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
+        Submit to Client
+      </button>
+
+      <button className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
+        Add Note
+      </button>
 
       <div className="mt-6 grid gap-6 xl:grid-cols-3">
         <section className="space-y-6 xl:col-span-2">
@@ -90,6 +99,21 @@ export default async function CandidateDetailPage({
               <Info
                 label="Phone"
                 value={candidate.phone ?? "No phone listed"}
+              />
+              <Info
+                label="Resume"
+                value={candidate.resume_filename ?? "No resume uploaded"}
+              />
+
+              <Info
+                label="Resume Status"
+                value={
+                  !candidate.resume_filename
+                    ? "No resume uploaded"
+                    : candidate.resume_parsed
+                      ? "Parsed"
+                      : "Awaiting parsing"
+                }
               />
               <Info
                 label="Location"
@@ -251,9 +275,11 @@ export default async function CandidateDetailPage({
                 Submit to Client
               </button>
 
-              <button className="w-full rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
-                Upload Resume
-              </button>
+              <ResumeUploadButton
+                candidateId={candidate.id}
+                currentFilename={candidate.resume_filename}
+              />
+              <DeleteCandidateButton candidateId={candidate.id} />
             </div>
           </div>
 

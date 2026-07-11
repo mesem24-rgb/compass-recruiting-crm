@@ -6,22 +6,90 @@ export type Candidate = {
   id: string;
   created_at: string;
   name: string;
+
   role: string | null;
   email: string | null;
   phone: string | null;
   location: string | null;
+  zip_code: string | null;
   status: string | null;
   source: string | null;
   recruiter: string | null;
   experience: string | null;
   salary: string | null;
+
   priority_skills: string[] | null;
   secondary_skills: string[] | null;
   keywords: string[] | null;
   preferred_location: string | null;
   willing_to_relocate: boolean | null;
-  zip_code: string | null;
+
+  resume_path: string | null;
+  resume_filename: string | null;
+  resume_uploaded_at: string | null;
+  resume_parsed: boolean | null;
+  resume_text: string | null;
 };
+
+/* SECTION: Upload Candidate Resume */
+
+export async function uploadCandidateResume({
+  candidateId,
+  file,
+}: {
+  candidateId: string;
+  file: File;
+}) {
+  const fileExtension = file.name.split(".").pop()?.toLowerCase() ?? "pdf";
+  const safeFileName = file.name
+    .replace(/\.[^/.]+$/, "")
+    .replace(/[^a-zA-Z0-9-_]/g, "-")
+    .toLowerCase();
+
+  const storagePath = `${candidateId}/${Date.now()}-${safeFileName}.${fileExtension}`;
+
+  const { error: uploadError } = await supabase.storage
+    .from("candidate-resumes")
+    .upload(storagePath, file, {
+      contentType: file.type,
+      upsert: false,
+    });
+
+  if (uploadError) {
+    throw new Error(uploadError.message);
+  }
+
+  const { error: updateError } = await supabase
+    .from("candidates")
+    .update({
+      resume_path: storagePath,
+      resume_filename: file.name,
+      resume_uploaded_at: new Date().toISOString(),
+      resume_parsed: false,
+    })
+    .eq("id", candidateId);
+
+  if (updateError) {
+    await supabase.storage.from("candidate-resumes").remove([storagePath]);
+    throw new Error(updateError.message);
+  }
+
+  return storagePath;
+}
+
+/* SECTION: Create Resume Signed URL */
+
+export async function getCandidateResumeUrl(resumePath: string) {
+  const { data, error } = await supabase.storage
+    .from("candidate-resumes")
+    .createSignedUrl(resumePath, 60 * 10);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data.signedUrl;
+}
 
 /* SECTION: Candidate Queries */
 
@@ -78,11 +146,18 @@ export type UpdateCandidateInput = {
   recruiter: string;
   experience: string;
   salary: string;
+
   priority_skills: string[];
   secondary_skills: string[];
   keywords: string[];
   preferred_location: string;
   willing_to_relocate: boolean;
+
+  resume_path?: string | null;
+  resume_filename?: string | null;
+  resume_uploaded_at?: string | null;
+  resume_parsed?: boolean | null;
+  resume_text?: string | null;
 };
 
 export async function updateCandidate(
