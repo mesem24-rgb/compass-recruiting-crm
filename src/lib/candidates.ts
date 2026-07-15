@@ -29,6 +29,10 @@ export type Candidate = {
   resume_uploaded_at: string | null;
   resume_parsed: boolean | null;
   resume_text: string | null;
+
+  resume_processing_status: string | null;
+  resume_processing_error: string | null;
+  parsed_at: string | null;
 };
 
 /* SECTION: Upload Candidate Resume */
@@ -65,7 +69,11 @@ export async function uploadCandidateResume({
       resume_path: storagePath,
       resume_filename: file.name,
       resume_uploaded_at: new Date().toISOString(),
+
       resume_parsed: false,
+
+      resume_processing_status: "pending",
+      resume_processing_error: null,
     })
     .eq("id", candidateId);
 
@@ -158,6 +166,10 @@ export type UpdateCandidateInput = {
   resume_uploaded_at?: string | null;
   resume_parsed?: boolean | null;
   resume_text?: string | null;
+
+  resume_processing_status?: string | null;
+  resume_processing_error?: string | null;
+  parsed_at?: string | null;
 };
 
 export async function updateCandidate(

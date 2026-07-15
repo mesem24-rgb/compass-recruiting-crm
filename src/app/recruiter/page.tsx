@@ -4,19 +4,21 @@ import PageHeader from "@/components/ui/PageHeader";
 import PageSection from "@/components/ui/PageSection";
 import EmptyState from "@/components/ui/EmptyState";
 import StatusBadge from "@/components/ui/StatusBadge";
+import NotificationList from "@/components/recruiter/NotificationList";
 import { getCandidates } from "@/lib/candidates";
 import { getJobOrders, getAssignmentLockStatus } from "@/lib/job-orders";
 import { getSubmissionsForJobOrder } from "@/lib/submissions";
-import NotificationList from "@/components/recruiter/NotificationList";
 import { buildRecruiterNotifications } from "@/lib/notifications";
+import { getUpcomingInterviews } from "@/lib/interviews";
 
 const currentRecruiter = "Michael Sullivan";
 const currentRecruiterId = "michael-sullivan";
 
 export default async function RecruiterWorkspacePage() {
-  const [candidates, jobOrders] = await Promise.all([
+  const [candidates, jobOrders, upcomingInterviews] = await Promise.all([
     getCandidates(),
     getJobOrders(),
+    getUpcomingInterviews(),
   ]);
 
   const assignedJobs = jobOrders.filter(
@@ -24,8 +26,6 @@ export default async function RecruiterWorkspacePage() {
       job.assigned_recruiter === currentRecruiter ||
       job.assigned_recruiter_id === currentRecruiterId,
   );
-
-  
 
   const replacementJobs = assignedJobs.filter(
     (job) => job.replacement_priority === true,
@@ -49,6 +49,12 @@ export default async function RecruiterWorkspacePage() {
     (candidate) => candidate.recruiter === currentRecruiter,
   );
 
+  const myCandidateIds = new Set(myCandidates.map((candidate) => candidate.id));
+
+  const myUpcomingInterviews = upcomingInterviews
+    .filter((interview) => myCandidateIds.has(interview.candidate_id))
+    .slice(0, 5);
+
   const interviews = myCandidates.filter(
     (candidate) => candidate.status === "Interview",
   ).length;
@@ -58,9 +64,10 @@ export default async function RecruiterWorkspacePage() {
   ).length;
 
   const notifications = buildRecruiterNotifications({
-  candidates,
-  jobOrders,
-});
+    candidates: myCandidates,
+    jobOrders: assignedJobs,
+    interviews: myUpcomingInterviews,
+  });
 
   const submissionGroups = await Promise.all(
     assignedJobs.map(async (job) => ({
@@ -262,6 +269,72 @@ export default async function RecruiterWorkspacePage() {
               <EmptyState
                 title="No replacement priority jobs."
                 description="Replacement roles will appear here when marked as priority."
+              />
+            )}
+          </div>
+        </PageSection>
+
+        {/* SECTION: Upcoming Interviews */}
+
+        <PageSection
+          title="Upcoming Interviews"
+          description="The next scheduled interviews for your candidates."
+        >
+          <div className="space-y-3">
+            {myUpcomingInterviews.length > 0 ? (
+              myUpcomingInterviews.map((interview) => {
+                const candidate = myCandidates.find(
+                  (item) => item.id === interview.candidate_id,
+                );
+
+                if (!candidate) return null;
+
+                return (
+                  <Link
+                    key={interview.id}
+                    href={`/candidates/${candidate.id}`}
+                    className="block rounded-lg border border-slate-100 bg-slate-50 p-4 hover:bg-slate-100"
+                  >
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                      <div>
+                        <p className="font-medium text-slate-950">
+                          {candidate.name}
+                        </p>
+
+                        <p className="text-sm text-slate-500">
+                          {candidate.role ?? "No role listed"}
+                        </p>
+
+                        <p className="mt-2 text-xs text-slate-500">
+                          {new Date(
+                            `${interview.interview_date}T${interview.interview_time}`,
+                          ).toLocaleString([], {
+                            weekday: "short",
+                            month: "short",
+                            day: "numeric",
+                            hour: "numeric",
+                            minute: "2-digit",
+                          })}
+                        </p>
+                      </div>
+
+                      <div className="flex flex-wrap gap-2">
+                        <span className="rounded-full bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700">
+                          {interview.interview_type}
+                        </span>
+
+                        <span className="rounded-full bg-emerald-50 px-2 py-1 text-xs font-medium text-emerald-700">
+                          {interview.status}
+                        </span>
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })
+            ) : (
+              <EmptyState
+                title="No upcoming interviews."
+                description="Scheduled candidate interviews will appear here."
               />
             )}
           </div>

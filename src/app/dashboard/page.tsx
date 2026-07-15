@@ -64,7 +64,6 @@ export default async function DashboardPage() {
 
   return (
     <AppShell>
-      {/* SECTION: Dashboard Header */}
 
       <DashboardHeader />
 

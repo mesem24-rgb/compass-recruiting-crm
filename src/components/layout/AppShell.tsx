@@ -5,20 +5,24 @@ import ModalProvider from "@/components/providers/ModalProvider";
 import { getCandidates } from "@/lib/candidates";
 import { getJobOrders } from "@/lib/job-orders";
 import { buildRecruiterNotifications } from "@/lib/notifications";
+import { getUpcomingInterviews } from "@/lib/interviews";
 
 export default async function AppShell({
   children,
 }: {
   children: ReactNode;
 }) {
-  const [candidates, jobOrders] = await Promise.all([
+  const [candidates, jobOrders, interviews] = await Promise.all([
     getCandidates(),
     getJobOrders(),
+    getUpcomingInterviews(),
+
   ]);
 
   const notifications = buildRecruiterNotifications({
     candidates,
     jobOrders,
+    interviews,
   });
 
   return (

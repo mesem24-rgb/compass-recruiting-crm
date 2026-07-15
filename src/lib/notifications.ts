@@ -1,6 +1,7 @@
 import type { Candidate } from "@/lib/candidates";
 import type { JobOrder } from "@/lib/job-orders";
 import { getAssignmentLockStatus } from "@/lib/job-orders";
+import type { Interview } from "@/lib/interviews";
 
 /* SECTION: Notification Type */
 
@@ -18,9 +19,11 @@ export type Notification = {
 export function buildRecruiterNotifications({
   jobOrders,
   candidates,
+  interviews = [],
 }: {
   jobOrders: JobOrder[];
   candidates: Candidate[];
+  interviews?: Interview[];
 }): Notification[] {
   const notifications: Notification[] = [];
 
@@ -85,6 +88,41 @@ export function buildRecruiterNotifications({
         type: "success",
         created_at: candidate.created_at,
         href: `/candidates/${candidate.id}`,
+      });
+    });
+
+  /* SECTION: Interview Notifications */
+
+  interviews
+    .filter((interview) => {
+      if (!interview.interview_date || !interview.interview_time) {
+        return false;
+      }
+
+      const interviewDateTime = new Date(
+        `${interview.interview_date}T${interview.interview_time}`,
+      );
+
+      return (
+        interview.status === "Scheduled" &&
+        interviewDateTime.getTime() >= new Date().getTime()
+      );
+    })
+    .slice(0, 5)
+    .forEach((interview) => {
+      const candidate = candidates.find(
+        (candidate) => candidate.id === interview.candidate_id,
+      );
+
+      notifications.push({
+        id: `interview-scheduled-${interview.id}`,
+        title: "Upcoming Interview",
+        description: candidate
+          ? `${candidate.name} has a ${interview.interview_type.toLowerCase()} interview scheduled.`
+          : `A ${interview.interview_type.toLowerCase()} interview is scheduled.`,
+        type: "info",
+        created_at: interview.created_at,
+        href: `/candidates/${interview.candidate_id}`,
       });
     });
 
