@@ -34,7 +34,7 @@ export default function SubmitCandidateModal({
       candidateId,
       jobOrderId,
       stage: "Submitted",
-      notes,
+      recruiterNotes: notes,
     });
 
     setCandidateId("");
