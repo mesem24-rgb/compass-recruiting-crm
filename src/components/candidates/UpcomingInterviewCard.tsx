@@ -1,6 +1,7 @@
 import PageSection from "@/components/ui/PageSection";
 import EmptyState from "@/components/ui/EmptyState";
 import type { Interview } from "@/lib/interviews";
+import InterviewStatusActions from "@/components/interviews/InterviewStatusActions";
 
 type UpcomingInterviewCardProps = {
   interviews: Interview[];
@@ -14,6 +15,7 @@ export default function UpcomingInterviewCard({
       if (!interview.interview_date || !interview.interview_time) {
         return false;
       }
+
       const interviewDateTime = new Date(
         `${interview.interview_date}T${interview.interview_time}`,
       );
@@ -42,6 +44,8 @@ export default function UpcomingInterviewCard({
     >
       {upcomingInterview ? (
         <div className="rounded-xl border border-blue-200 bg-blue-50 p-5">
+          {/* SECTION: Interview Header */}
+
           <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
             <div>
               <p className="text-sm font-semibold text-blue-700">
@@ -67,6 +71,8 @@ export default function UpcomingInterviewCard({
             </span>
           </div>
 
+          {/* SECTION: Interview Details */}
+
           <div className="mt-5 grid gap-3 md:grid-cols-2">
             <InterviewInfo
               label="Interviewer"
@@ -82,6 +88,8 @@ export default function UpcomingInterviewCard({
             />
           </div>
 
+          {/* SECTION: Interview Notes */}
+
           {upcomingInterview.notes && (
             <div className="mt-4 rounded-lg border border-blue-100 bg-white p-4">
               <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
@@ -94,16 +102,27 @@ export default function UpcomingInterviewCard({
             </div>
           )}
 
-          {isMeetingLink(upcomingInterview.meeting_location) && (
-            <a
-              href={upcomingInterview.meeting_location ?? "#"}
-              target="_blank"
-              rel="noreferrer"
-              className="mt-4 inline-flex rounded-lg bg-slate-950 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800"
-            >
-              Open Meeting Link
-            </a>
-          )}
+          {/* SECTION: Interview Actions */}
+
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-blue-200 pt-4">
+            {isMeetingLink(upcomingInterview.meeting_location) ? (
+              <a
+                href={upcomingInterview.meeting_location ?? "#"}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex rounded-lg bg-slate-950 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800"
+              >
+                Open Meeting Link
+              </a>
+            ) : (
+              <div />
+            )}
+
+            <InterviewStatusActions
+              interviewId={upcomingInterview.id}
+              currentStatus={upcomingInterview.status}
+            />
+          </div>
         </div>
       ) : (
         <EmptyState
@@ -115,7 +134,13 @@ export default function UpcomingInterviewCard({
   );
 }
 
-function InterviewInfo({ label, value }: { label: string; value: string }) {
+function InterviewInfo({
+  label,
+  value,
+}: {
+  label: string;
+  value: string;
+}) {
   return (
     <div className="rounded-lg border border-blue-100 bg-white p-4">
       <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
